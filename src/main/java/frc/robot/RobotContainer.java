@@ -56,19 +56,13 @@ public class RobotContainer {
 
     public static final Drivetrain drivetrain = new Drivetrain();
 
-    public static final SendableChooser<String> drivePresetsChooser = new SendableChooser<>();
-
     public static Field2d field = new Field2d();
-    public static Field2d nodeSelector = new Field2d();
 
-    //  private final FieldObject2d startingPosition = field.getObject("Starting Position");
     private final FieldObject2d autoBalanceStartingPosition = field.getObject("Auto Balance Starting Position");
 
     private DriveWithJoysticks driveCommand = new DriveWithJoysticks(drivetrain, PoseEstimation.getInstance(), joystick1);
-    //private AutoBalance autoBalanceCommand = new AutoBalance(drivetrain);
-    public static final ArmLockSubsystem armlocksubsystem = new ArmLockSubsystem();
-    public static final LimelightSubsystem limelightSubsystem = new LimelightSubsystem();
 
+    public static final LimelightSubsystem limelightSubsystem = new LimelightSubsystem();
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -117,12 +111,12 @@ public class RobotContainer {
         );
 
         new JoystickButton(joystick1, 10).whileTrue(
-                new ArmLockCommand(armlocksubsystem, true
-                ));
+                ArmLockCommand.getInstance());
 
-        new JoystickButton(joystick2, 9).whileTrue(new ReverseArmLock(armlocksubsystem, true));
+        new JoystickButton(joystick2, 9).whileTrue(
+                ReverseArmLock.getInstance());
 
-        new JoystickButton(joystick1, 9).//7
+        new JoystickButton(joystick1, 9).
                 onTrue(new InstantCommand(() -> PoseEstimation.getInstance().resetPose(
                 new Pose2d(
                         PoseEstimation.getInstance().getEstimatedPose().getTranslation(),
