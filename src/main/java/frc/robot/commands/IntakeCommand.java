@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MZ80;
 
@@ -15,6 +16,7 @@ public class IntakeCommand extends Command {
     private final MZ80 mz80;
     private final IntakeSubsystem intakeSubsystem;
     private boolean start;
+    private boolean isCommandEnd = false;
 
     /**
      * Creates a new IntakeCommand.
@@ -38,28 +40,41 @@ public class IntakeCommand extends Command {
         return instance;
     }
 
-    // Called when the command is initially scheduled.
+   
     @Override
     public void initialize() {
     }
 
-    // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
         if (start) {
-            if (mz80.sensorget()) {
+           if (mz80.sensorget() == true) {
+              intakeSubsystem.setMotor(false);
+              isCommandEnd = true;
+            }else {
                 intakeSubsystem.setMotor(true);
+                isCommandEnd = false;
             }
+          
         } else {
             intakeSubsystem.setMotor(false);
         }
 
     }
 
-    // Called once the command ends or is interrupted.
+
+ 
     @Override
     public void end(boolean interrupted) {
         intakeSubsystem.setMotor(false);
     }
 
+  
+    @Override
+    public boolean isFinished() {
+        System.out.println("-----ultrasonic sensor");
+        System.out.println(String.valueOf(mz80.sensorget()));
+        return isCommandEnd;
+  
+    }
 }
