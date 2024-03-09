@@ -12,6 +12,7 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.subsystems.drivetrain.Drivetrain;
 
 public class PoseEstimation {
     private static PoseEstimation instance = null;
@@ -29,8 +30,8 @@ public class PoseEstimation {
     public PoseEstimation() {
         poseEstimator = new SwerveDrivePoseEstimator(
                 DriveConstants.DRIVE_KINEMATICS,
-                RobotContainer.drivetrain.getRotation(),
-                RobotContainer.drivetrain.getModulePositions(),
+                Drivetrain.getInstance().getRotation(),
+                Drivetrain.getInstance().getModulePositions(),
                 new Pose2d(),
                 Constants.DriveConstants.ODOMETRY_STD_DEV,
                 VecBuilder.fill(0, 0, 0) // will be overwritten for each measurement
@@ -59,8 +60,8 @@ public class PoseEstimation {
 
     public void resetPose(Pose2d pose) {
         poseEstimator.resetPosition(
-                RobotContainer.drivetrain.getRotation(),
-                RobotContainer.drivetrain.getModulePositions(),
+                Drivetrain.getInstance().getRotation(),
+                Drivetrain.getInstance().getModulePositions(),
                 pose
         );
     }

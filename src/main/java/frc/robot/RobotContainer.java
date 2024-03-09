@@ -54,30 +54,40 @@ public class RobotContainer {
     public static final Joystick joystick1 = new Joystick(Constants.JoystickConstants.SwerveJoystick);
     public static final Joystick joystick2 = new Joystick(Constants.JoystickConstants.UpSystem);
 
-    public static final Drivetrain drivetrain = new Drivetrain();
-
     public static Field2d field = new Field2d();
 
     private final FieldObject2d autoBalanceStartingPosition = field.getObject("Auto Balance Starting Position");
 
-    private DriveWithJoysticks driveCommand = new DriveWithJoysticks(drivetrain, PoseEstimation.getInstance(), joystick1);
-
-    public static final LimelightSubsystem limelightSubsystem = new LimelightSubsystem();
+    private DriveWithJoysticks driveCommand = DriveWithJoysticks.getInstance();
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
         FRCPathPlanner.SetPathPlannerSettings();
-
-        drivetrain.setDefaultCommand(driveCommand);
+        driveCommand.setJoystickTranslation(joystick1);
+        Drivetrain.getInstance().setDefaultCommand(driveCommand);
 
         if (autoBalanceStartingPosition.getPoses().isEmpty()) {
-            autoBalanceStartingPosition.setPose(AllianceUtils.allianceToField(new Pose2d(new Translation2d(0, 0), new Rotation2d())));
+            autoBalanceStartingPosition.setPose(AllianceUtils.allianceToField(
+                            new Pose2d(
+                                    new Translation2d(
+                                            0,
+                                            0
+                                    ),
+                                    new Rotation2d()
+                            )
+                    )
+            );
         }
         configureBindings();
 
-        ArmSubsystem.getInstance().setDefaultCommand(new ArmCommand(ArmSubsystem.getInstance(), () -> joystick2.getRawAxis(1)));
+        ArmSubsystem.getInstance().setDefaultCommand(
+                new ArmCommand(
+                        ArmSubsystem.getInstance(),
+                        () -> joystick2.getRawAxis(1)
+                )
+        );
     }
 
     private void configureBindings() {
@@ -119,14 +129,14 @@ public class RobotContainer {
 
         new JoystickButton(joystick1, 9).
                 onTrue(new InstantCommand(() -> PoseEstimation.getInstance().resetPose(
-                new Pose2d(
-                        PoseEstimation.getInstance().getEstimatedPose().getTranslation(),
-                        new Rotation2d()))));
+                        new Pose2d(
+                                PoseEstimation.getInstance().getEstimatedPose().getTranslation(),
+                                new Rotation2d()))));
 
         new JoystickButton(joystick1, 8).
                 whileTrue(new RunCommand(
-                        drivetrain::setX,
-                        drivetrain));
+                        Drivetrain.getInstance()::setX,
+                        Drivetrain.getInstance()));
 
     }
 
@@ -144,17 +154,6 @@ public class RobotContainer {
 
     }
 
-    public static Drivetrain getSwerveSubsystem() {
-        return drivetrain;
-    }
-
-    public static LimelightSubsystem getLimelightSubsystem() {
-        return limelightSubsystem;
-    }
-
-    public static ArmSubsystem getArmSubsystem() {
-        return ArmSubsystem.getInstance();
-    }
 }
 
 

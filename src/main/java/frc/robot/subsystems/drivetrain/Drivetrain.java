@@ -30,12 +30,18 @@ import frc.robot.poseestimation.PoseEstimation;
 
 
 public class Drivetrain extends SubsystemBase {
+    private static Drivetrain instance;
 
-    // Create MAXSwerveModules
     private final SwerveModules swerveModules;
 
-    // The gyro sensor
     private final Gyro gyro;
+
+    public static Drivetrain getInstance() {
+        if (instance == null) {
+            instance = new Drivetrain();
+        }
+        return instance;
+    }
 
     /**
      * Creates a new DriveSubsystem.
@@ -151,13 +157,24 @@ public class Drivetrain extends SubsystemBase {
         swerveModules.setDesiredStates(
                 new SwerveModules.States(
                         // front left
-                        new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+                        new SwerveModuleState(
+                                0,
+                                Rotation2d.fromDegrees(45)
+                        ),
                         // front right
-                        new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+                        new SwerveModuleState(
+                                0,
+                                Rotation2d.fromDegrees(-45)
+                        ),
                         // rear left
-                        new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+                        new SwerveModuleState(
+                                0,
+                                Rotation2d.fromDegrees(-45)
+                        ),
                         // rear right
-                        new SwerveModuleState(0, Rotation2d.fromDegrees(45))
+                        new SwerveModuleState(0,
+                                Rotation2d.fromDegrees(45)
+                        )
                 ).asArray()
         );
     }
@@ -168,7 +185,10 @@ public class Drivetrain extends SubsystemBase {
      * @param desiredStates The desired SwerveModule states.
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.MAX_SPEED_METERS_PER_SECOND);
+        SwerveDriveKinematics.desaturateWheelSpeeds(
+                desiredStates,
+                DriveConstants.MAX_SPEED_METERS_PER_SECOND
+        );
         swerveModules.setDesiredStates(desiredStates);
     }
 

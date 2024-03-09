@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -11,28 +7,26 @@ import frc.robot.commands.AutoArm.PositionControl;
 import frc.robot.commands.CenterToTarget.CenterChecker;
 import frc.robot.commands.SlowArmDown.PositionController;
 import frc.robot.poseestimation.PoseEstimation;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.MZ80;
+import frc.robot.subsystems.drivetrain.Drivetrain;
 
-// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
-// information, see:
-// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class FireCommand extends SequentialCommandGroup {
-
-    /**
-     * Creates a new FireCommand.
-     */
     public FireCommand() {
         addCommands(
                 new ParallelCommandGroup(
-                        new CenterToTarget(RobotContainer.getSwerveSubsystem(), PoseEstimation.getInstance(),
-                                RobotContainer.getLimelightSubsystem(), CenterChecker.CENTER),
+                        new CenterToTarget(Drivetrain.getInstance(), PoseEstimation.getInstance(),
+                                LimelightSubsystem.getInstance(), CenterChecker.CENTER),
 
-                        new AutoArm(RobotContainer.getArmSubsystem(), RobotContainer.getLimelightSubsystem(), PositionControl.ShouldBe)
+                        new AutoArm(
+                                ArmSubsystem.getInstance(),
+                                LimelightSubsystem.getInstance(), PositionControl.ShouldBe)
                 ),
                 ShooterSenderCommand.getInstance(),
                 new SlowArmDown(
-                        RobotContainer.getArmSubsystem(),
+                        ArmSubsystem.getInstance(),
                         PositionController.Zero
                 )
         );

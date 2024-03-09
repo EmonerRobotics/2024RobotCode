@@ -19,6 +19,7 @@ import frc.robot.commands.ShooterSenderCommand;
 import frc.robot.commands.SlowArmDown;
 import frc.robot.commands.AutoArm.PositionControl;
 import frc.robot.commands.SlowArmDown.PositionController;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MZ80;
 
@@ -34,18 +35,26 @@ public class FRCPathPlanner {
     public static void setDashboard() {
         SmartDashboard.putData("Auto Mod", autoChooser);
         SmartDashboard.putBoolean("is AutoBuilder configure?", AutoBuilder.isConfigured());
-        SmartDashboard.putBoolean(" is pathfinding configure?", AutoBuilder.isPathfindingConfigured());
+        SmartDashboard.putBoolean("is pathfinding configure?", AutoBuilder.isPathfindingConfigured());
     }
 
     public static void CommandNameEntry() {
         NamedCommands.registerCommand("intake", IntakeCommand.getInstance());
         //NamedCommands.registerCommand("fire", new FireCommand());
         NamedCommands.registerCommand("shooter", ShooterCommand.getInstance());
-        NamedCommands.registerCommand("slowArm", new SlowArmDown(RobotContainer.getArmSubsystem(), PositionController.ShouldBe));
+        NamedCommands.registerCommand("slowArm", new SlowArmDown(
+                        ArmSubsystem.getInstance(),
+                        PositionController.ShouldBe
+                )
+        );
         NamedCommands.registerCommand("sender", ShooterSenderCommand.getInstance());
         NamedCommands.registerCommand("autoArm", AutoArm.getInstance());
         AutoArm.getInstance().setPositionControl(PositionControl.auto);
-        NamedCommands.registerCommand("zeroArm", new SlowArmDown(RobotContainer.getArmSubsystem(), PositionController.Zero));
+        NamedCommands.registerCommand("zeroArm", new SlowArmDown(
+                        ArmSubsystem.getInstance(),
+                        PositionController.Zero
+                )
+        );
     }
 
 }
