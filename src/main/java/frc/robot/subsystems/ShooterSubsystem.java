@@ -13,9 +13,17 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class ShooterSubsystem extends SubsystemBase {
 
+  private static ShooterSubsystem instance = null;
   private CANSparkMax shooterRmotor;
   private CANSparkMax shooterLmotor;
- 
+
+  public static ShooterSubsystem getInstance() {
+    if (instance == null) {
+      instance = new ShooterSubsystem();
+    }
+    return instance;
+  }
+
   /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() {
     shooterRmotor = new CANSparkMax(Constants.UpSystemConstants.rShooterMotorId, MotorType.kBrushless); //ID:10

@@ -26,7 +26,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
-
+import frc.robot.poseestimation.PoseEstimation;
 
 
 public class Drivetrain extends SubsystemBase {
@@ -36,14 +36,11 @@ public class Drivetrain extends SubsystemBase {
 
     // The gyro sensor
     private final Gyro gyro;
-    public  SwerveModule[] m_SwerveMods;
+
     /**
      * Creates a new DriveSubsystem.
      */
     public Drivetrain() {
-
-       
-    
         if (RobotBase.isSimulation()) {
             this.swerveModules = new SwerveModules(
                     new SIMSwerveModule(DriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET),
@@ -77,18 +74,11 @@ public class Drivetrain extends SubsystemBase {
         }
 
         gyro = (RobotBase.isReal() ? new NavXGyro() : new SIMGyro(swerveModules));
-
-        //RobotContainer.swerveTab.addNumber("Front Left", swerveModules.frontLeft::getSwerveEncoderPosition).withWidget(BuiltInWidgets.kGraph);
-        //RobotContainer.swerveTab.addNumber("Front Right", swerveModules.frontRight::getSwerveEncoderPosition).withWidget(BuiltInWidgets.kGraph);
-        //RobotContainer.swerveTab.addNumber("Back Left", swerveModules.rearLeft::getSwerveEncoderPosition).withWidget(BuiltInWidgets.kGraph);
-        //RobotContainer.swerveTab.addNumber("Back Right", swerveModules.rearRight::getSwerveEncoderPosition).withWidget(BuiltInWidgets.kGraph);
-
-        //RobotContainer.swerveTab.addNumber("Gyro", () -> gyro.getAngle().getRadians()).withWidget(BuiltInWidgets.kGraph);
     }
 
     @Override
     public void periodic() {
-        RobotContainer.poseEstimation.updateOdometry(
+        PoseEstimation.getInstance().updateOdometry(
                 getRotation(),
                 getModulePositions()
         );
@@ -103,13 +93,13 @@ public class Drivetrain extends SubsystemBase {
                 swerveModules.rearLeft.getSetState(),
                 swerveModules.rearRight.getSetState()
         });
-        SmartDashboard.putNumberArray("Swerve Module Distance", new double[] {
+        SmartDashboard.putNumberArray("Swerve Module Distance", new double[]{
                 swerveModules.frontLeft.getPosition().distanceMeters / Constants.ModuleConstants.WHEEL_CIRCUMFERENCE_METERS,
                 swerveModules.frontRight.getPosition().distanceMeters / Constants.ModuleConstants.WHEEL_CIRCUMFERENCE_METERS,
                 swerveModules.rearLeft.getPosition().distanceMeters / Constants.ModuleConstants.WHEEL_CIRCUMFERENCE_METERS,
                 swerveModules.rearRight.getPosition().distanceMeters / Constants.ModuleConstants.WHEEL_CIRCUMFERENCE_METERS});
 
-        SmartDashboard.putNumberArray("Swerve Module Distance Revolutions", new double[] {
+        SmartDashboard.putNumberArray("Swerve Module Distance Revolutions", new double[]{
                 swerveModules.frontLeft.getPosition().distanceMeters,
                 swerveModules.frontRight.getPosition().distanceMeters,
                 swerveModules.rearLeft.getPosition().distanceMeters,
@@ -135,7 +125,7 @@ public class Drivetrain extends SubsystemBase {
 
         return rot;
     }
-    
+
     public Rotation3d getRotation3d() {
         return gyro.getRotation3d();
     }
@@ -189,21 +179,6 @@ public class Drivetrain extends SubsystemBase {
         swerveModules.resetEncoders();
     }
 
-    /**
-     * Zeroes the heading of the robot.
-     */
-    public void zeroHeading() {
-        gyro.reset();
-    }
-
-    /**
-     * Returns the heading of the robot.
-     *
-     * @return the robot's heading in degrees, from -180 to 180
-     */
-    public Rotation2d getHeading() {
-        return gyro.getAngle();
-    }
 
     /**
      * Returns the turn rate of the robot.
@@ -213,45 +188,45 @@ public class Drivetrain extends SubsystemBase {
     public double getTurnRate() {
         return gyro.getRate().getDegrees();
     }
-   
+
     public ChassisSpeeds pgetChassisSpeed() {
-       return DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(
-        swerveModules.frontLeft.getState(),
-        swerveModules.frontRight.getState(),
-        swerveModules.rearLeft.getState(),
-        swerveModules.rearRight.getState()
+        return DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(
+                swerveModules.frontLeft.getState(),
+                swerveModules.frontRight.getState(),
+                swerveModules.rearLeft.getState(),
+                swerveModules.rearRight.getState()
         );
     }
-    
 
-     public void BuilderConfigure(){
-         AutoBuilder.configureHolonomic(
-            RobotContainer.poseEstimation::getEstimatedPose, // Robot pose supplier
-            RobotContainer.poseEstimation::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
-            this::pgetChassisSpeed, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            this::drive,  // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-            new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                    new PIDConstants(ModuleConstants.DRIVING_P, ModuleConstants.DRIVING_I, ModuleConstants.DRIVING_D), // Translation PID constants
-                    new PIDConstants(ModuleConstants.TURNING_P, ModuleConstants.TURNING_I, ModuleConstants.TURNING_D), // Rotation PID constants
-                    DriveConstants.MAX_SPEED_METERS_PER_SECOND, // Max module speed, in m/s
-                    16.278828206, // Drive base radius in meters. Distance from robot center to furthest module.
-                    new ReplanningConfig(true,true)
-            ), 
-            () -> {
-                // Boolean supplier that controls when the path will be mirrored for the red alliance
-                // This will flip the path being followed to the red side of the field.
-                // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-                var alliance = DriverStation.getAlliance();
-                if (alliance.isPresent()) {
-                    return alliance.get() == DriverStation.Alliance.Red;
-                }
-                return false;
-            },
-            this // Reference to this subsystem to set requirements
-    );
-      }
-        }
+    public void BuilderConfigure() {
+        AutoBuilder.configureHolonomic(
+                PoseEstimation.getInstance()::getEstimatedPose, // Robot pose supplier
+                PoseEstimation.getInstance()::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+                this::pgetChassisSpeed, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                this::drive,  // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+                new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+                        new PIDConstants(ModuleConstants.DRIVING_P, ModuleConstants.DRIVING_I, ModuleConstants.DRIVING_D), // Translation PID constants
+                        new PIDConstants(ModuleConstants.TURNING_P, ModuleConstants.TURNING_I, ModuleConstants.TURNING_D), // Rotation PID constants
+                        DriveConstants.MAX_SPEED_METERS_PER_SECOND, // Max module speed, in m/s
+                        16.278828206, // Drive base radius in meters. Distance from robot center to furthest module.
+                        new ReplanningConfig(true, true)
+                ),
+                () -> {
+                    // Boolean supplier that controls when the path will be mirrored for the red alliance
+                    // This will flip the path being followed to the red side of the field.
+                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+                    var alliance = DriverStation.getAlliance();
+                    if (alliance.isPresent()) {
+                        return alliance.get() == DriverStation.Alliance.Red;
+                    }
+                    return false;
+                },
+                this // Reference to this subsystem to set requirements
+        );
+    }
+}
         
     
     

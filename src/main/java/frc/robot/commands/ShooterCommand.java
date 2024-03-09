@@ -9,13 +9,21 @@ import frc.robot.subsystems.ShooterSubsystem;
 
 public class ShooterCommand extends Command {
 
+  private static ShooterCommand instance = null;
   private final ShooterSubsystem shooterSubsystem;
   private final boolean start;
 
+  public static ShooterCommand getInstance() {
+    if (instance == null) {
+      instance = new ShooterCommand();
+    }
+    return instance;
+  }
+
   /** Creates a new ShooterCommand. */
-  public ShooterCommand(ShooterSubsystem shooterSubsystem, boolean start) {
-    this.shooterSubsystem = shooterSubsystem;
-    this.start = start;
+  public ShooterCommand() {
+    this.shooterSubsystem = ShooterSubsystem.getInstance();
+    this.start = true;
     addRequirements(shooterSubsystem);
   } 
 

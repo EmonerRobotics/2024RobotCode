@@ -8,39 +8,56 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ArmLockSubsystem;
 
 public class ArmLockCommand extends Command {
-  public ArmLockSubsystem armLockSubsystem;
-  public boolean start;
-  /** Creates a new IntakeLockCommand. */
-  public ArmLockCommand(ArmLockSubsystem armLockSubsystem, boolean start) {
-    this.armLockSubsystem = armLockSubsystem;
-    this.start = start;
-    addRequirements(armLockSubsystem);
-    // Use addRequirements() here to declare subsystem dependencies.
-  }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {}
+    private static ArmLockCommand instance = null;
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    if(start){
-      armLockSubsystem.setLockMotor(true);
-    }else{
-      armLockSubsystem.setLockMotor(false);
+    public ArmLockSubsystem armLockSubsystem;
+    public boolean start;
+
+    public static ArmLockCommand getInstance() {
+        if (instance == null) {
+            instance = new ArmLockCommand(
+                    ArmLockSubsystem.getInstance(),
+                    true
+            );
+        }
+        return instance;
     }
-  }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    armLockSubsystem.setLockMotor(false);
-  }
+    /**
+     * Creates a new IntakeLockCommand.
+     */
+    public ArmLockCommand(ArmLockSubsystem armLockSubsystem, boolean start) {
+        this.armLockSubsystem = armLockSubsystem;
+        this.start = start;
+        addRequirements(armLockSubsystem);
+        // Use addRequirements() here to declare subsystem dependencies.
+    }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+    }
+
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        if (start) {
+            armLockSubsystem.setLockMotor(true);
+        } else {
+            armLockSubsystem.setLockMotor(false);
+        }
+    }
+
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        armLockSubsystem.setLockMotor(false);
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
 }

@@ -7,116 +7,126 @@ package frc.robot.commands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.poseestimation.PoseEstimation;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
 
 public class AutoArm extends Command {
 
-  public static enum PositionControl{
-    ShouldBe,
-    Amphi,
-    auto
-  }
-
-  private final ArmSubsystem armSubsystem;
-  private final LimelightSubsystem limelightSubsystem;
-  private final PIDController pidController;
-  private final PositionControl positionControl;
-
-  /** Creates a new AutoArm. */
-  //PositionControl positionControl
-  public AutoArm(ArmSubsystem armSubsystem, LimelightSubsystem limelightSubsystem, PositionControl positionControl) {
-    this.armSubsystem = armSubsystem;
-    this.limelightSubsystem = limelightSubsystem;
-    this.pidController = new PIDController(0.06, 0.025, 0.001);
-    this.positionControl = positionControl; 
-    addRequirements(armSubsystem);
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    pidController.reset();
-  }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    if(positionControl == PositionControl.ShouldBe){
-    pidController.setSetpoint(limelightSubsystem.findShooterDegrees());
-    double speed = pidController.calculate(armSubsystem.getEncoderDegrees());
-    armSubsystem.manuelArmControl(-speed);
-
-    }else if(positionControl == PositionControl.Amphi){
-      pidController.setSetpoint(88);
-      double speed = 0.5 * pidController.calculate(armSubsystem.getEncoderDegrees());
-      armSubsystem.manuelArmControl(-speed);
-
-    }else if (positionControl == PositionControl.auto){
-      pidController.setSetpoint(14.5);
-      double speed = 0.5 * pidController.calculate(armSubsystem.getEncoderDegrees());
-      armSubsystem.manuelArmControl(-speed);
+    public enum PositionControl {
+        ShouldBe,
+        Amphi,
+        auto
     }
-    /*else if(positionControl == PositionControl.Cover){
-      pidController.setSetpoint(45);
-      double speed = pidController.calculate(armSubsystem.getEncoderDegrees());
-      armSubsystem.manuelArmControl(-speed);
-      
-    } */
-    
-  }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    armSubsystem.manuelArmControl(0);
-  }
+    private static AutoArm instance = null;
+    private final ArmSubsystem armSubsystem;
+    private final LimelightSubsystem limelightSubsystem;
+    private final PIDController pidController;
+    private PositionControl positionControl;
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    if(positionControl == PositionControl.ShouldBe){
-      double error = armSubsystem.getEncoderDegrees() - limelightSubsystem.findShooterDegrees(); 
-      SmartDashboard.putNumber("ARM SPEAKER ERROR: ", error);
+    public static AutoArm getInstance(
 
-      if( Math.abs(error) < 1.5){
-        System.out.println(" NORMAL ARM BITTI");
-        return true;
-      }else{
-        return false;
-      }
+    ) {
+        if (instance == null) {
+            instance = new AutoArm(
+                    ArmSubsystem.getInstance(),
+                    LimelightSubsystem.getInstance(),
+                    PositionControl.Amphi
+            );
+        }
+        return instance;
+    }
 
-    }else if (positionControl == PositionControl.Amphi){
-      double error = armSubsystem.getEncoderDegrees() - 88;
-      SmartDashboard.putNumber("ARM AMPHI ERROR", error);
+    public void setPositionControl(PositionControl positionControl) {
+        this.positionControl = positionControl;
+    }
 
-      if(Math.abs(error) < 1){
-        System.out.println("AMPHI ARM BITTI");
-        return true;
-      }else{
-        return false;
-      }
-    }else if(positionControl == PositionControl.auto){
-      double error = armSubsystem.getEncoderDegrees() - 14.5;
-        if(Math.abs(error) < 1.5){
-          return true;
-        } else{
-          return false;
+    /**
+     * Creates a new AutoArm.
+     */
+    //PositionControl positionControl
+    public AutoArm(ArmSubsystem armSubsystem,
+                   LimelightSubsystem limelightSubsystem,
+                   PositionControl positionControl
+    ) {
+        this.armSubsystem = armSubsystem;
+        this.limelightSubsystem = limelightSubsystem;
+        this.pidController = new PIDController(
+                0.06,
+                0.025,
+                0.001
+        );
+        this.positionControl = positionControl;
+        addRequirements(armSubsystem);
+    }
+
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+        pidController.reset();
+    }
+
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        if (positionControl == PositionControl.ShouldBe) {
+            pidController.setSetpoint(limelightSubsystem.findShooterDegrees());
+            double speed = pidController.calculate(armSubsystem.getEncoderDegrees());
+            armSubsystem.manuelArmControl(-speed);
+
+        } else if (positionControl == PositionControl.Amphi) {
+            pidController.setSetpoint(88);
+            double speed = 0.5 * pidController.calculate(armSubsystem.getEncoderDegrees());
+            armSubsystem.manuelArmControl(-speed);
+
+        } else if (positionControl == PositionControl.auto) {
+            pidController.setSetpoint(14.5);
+            double speed = 0.5 * pidController.calculate(armSubsystem.getEncoderDegrees());
+            armSubsystem.manuelArmControl(-speed);
+        }
+
+    }
+
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        armSubsystem.manuelArmControl(0);
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        if (positionControl == PositionControl.ShouldBe) {
+            double error = armSubsystem.getEncoderDegrees() - limelightSubsystem.findShooterDegrees();
+            SmartDashboard.putNumber("ARM SPEAKER ERROR: ", error);
+
+            if (Math.abs(error) < 1.5) {
+                System.out.println(" NORMAL ARM BITTI");
+                return true;
+            } else {
+                return false;
+            }
+
+        } else if (positionControl == PositionControl.Amphi) {
+            double error = armSubsystem.getEncoderDegrees() - 88;
+            SmartDashboard.putNumber("ARM AMPHI ERROR", error);
+
+            if (Math.abs(error) < 1) {
+                System.out.println("AMPHI ARM BITTI");
+                return true;
+            } else {
+                return false;
+            }
+        } else if (positionControl == PositionControl.auto) {
+            double error = armSubsystem.getEncoderDegrees() - 14.5;
+            if (Math.abs(error) < 1.5) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
         }
     }
-    /*else if(positionControl == PositionControl.Cover){
-      double error = armSubsystem.getEncoderDegrees() - 45;
-      if(Math.abs(error) < 1){
-        return true;
-      }else{
-        return false;
-      }*/
-    else{
-      return false;
-    }
-    
-
-    //return (Math.abs(error) < 0.5);
-    //return false;
-  }
 }

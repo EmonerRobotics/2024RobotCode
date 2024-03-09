@@ -19,34 +19,33 @@ import frc.robot.commands.ShooterSenderCommand;
 import frc.robot.commands.SlowArmDown;
 import frc.robot.commands.AutoArm.PositionControl;
 import frc.robot.commands.SlowArmDown.PositionController;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.MZ80;
 
 
 public class FRCPathPlanner {
+    public final static SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
 
-    public final static SendableChooser<Command> autoChooser=AutoBuilder.buildAutoChooser();
-    
-    public static void SetPathPlannerSettings(){
-      setDashboard();
-      CommandNameEntry();
-      
+    public static void SetPathPlannerSettings() {
+        setDashboard();
+        CommandNameEntry();
     }
-    public static void setDashboard(){
+
+    public static void setDashboard() {
         SmartDashboard.putData("Auto Mod", autoChooser);
         SmartDashboard.putBoolean("is AutoBuilder configure?", AutoBuilder.isConfigured());
         SmartDashboard.putBoolean(" is pathfinding configure?", AutoBuilder.isPathfindingConfigured());
     }
 
-    public static void CommandNameEntry(){
-    NamedCommands.registerCommand("intake", new IntakeCommand(RobotContainer.getIntakeSubsystem(), RobotContainer.getMZ80(), true));
-    NamedCommands.registerCommand("fire", new FireCommand());
-    NamedCommands.registerCommand("shooter", new ShooterCommand(RobotContainer.getShooterSubsystem(), true));
-    NamedCommands.registerCommand("slowArm", new SlowArmDown(RobotContainer.getArmSubsystem(), PositionController.ShouldBe));
-    NamedCommands.registerCommand("sender", new ShooterSenderCommand(RobotContainer.getIntakeSubsystem(), RobotContainer.getMZ80(), true));
-    NamedCommands.registerCommand("autoArm", new AutoArm(RobotContainer.getArmSubsystem(), RobotContainer.getLimelightSubsystem(), PositionControl.auto));
-    NamedCommands.registerCommand("zeroArm", new SlowArmDown(RobotContainer.getArmSubsystem(), PositionController.Zero));
-
-    // NamedCommands.registerCommand("intake", new IntakeCommand(RobotContainer.getIntakeSubsystem(), RobotContainer.getMZ80(), true).withTimeout(5));
-    
+    public static void CommandNameEntry() {
+        NamedCommands.registerCommand("intake", IntakeCommand.getInstance());
+        //NamedCommands.registerCommand("fire", new FireCommand());
+        NamedCommands.registerCommand("shooter", ShooterCommand.getInstance());
+        NamedCommands.registerCommand("slowArm", new SlowArmDown(RobotContainer.getArmSubsystem(), PositionController.ShouldBe));
+        NamedCommands.registerCommand("sender", ShooterSenderCommand.getInstance());
+        NamedCommands.registerCommand("autoArm", AutoArm.getInstance());
+        AutoArm.getInstance().setPositionControl(PositionControl.auto);
+        NamedCommands.registerCommand("zeroArm", new SlowArmDown(RobotContainer.getArmSubsystem(), PositionController.Zero));
     }
-    
+
 }

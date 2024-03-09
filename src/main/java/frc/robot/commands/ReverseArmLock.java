@@ -8,8 +8,22 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ArmLockSubsystem;
 
 public class ReverseArmLock extends Command {
+
+  private static ReverseArmLock instance = null;
+
   public ArmLockSubsystem armLockSubsystem;
   public boolean reverse;
+
+    public static ReverseArmLock getInstance() {
+        if (instance == null) {
+        instance = new ReverseArmLock(
+            ArmLockSubsystem.getInstance(),
+            true
+        );
+        }
+        return instance;
+    }
+
   /** Creates a new IntakeLockCommand. */
   public ReverseArmLock(ArmLockSubsystem armLockSubsystem, boolean reverse) {
     this.armLockSubsystem = armLockSubsystem;
