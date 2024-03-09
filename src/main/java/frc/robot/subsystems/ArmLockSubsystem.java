@@ -9,26 +9,28 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ArmLockSubsystem extends SubsystemBase {
   private PWMVictorSPX armLockMotor;
+
   /** Creates a new ArmLockSubsystem. */
   public ArmLockSubsystem() {
+    String a = "Ahmet";
     armLockMotor = new PWMVictorSPX(0);
   }
 
-  public void setLockMotor(boolean start){
-    if(start){
+  public void setLockMotor(boolean start) {
+    if (start) {
       armLockMotor.set(1);
-  }else{
-    armLockMotor.stopMotor();
+    } else {
+      armLockMotor.stopMotor();
+    }
   }
-}
 
-public void setReverseMotor(boolean Reverse){
-   if(Reverse){
+  public void setReverseMotor(boolean Reverse) {
+    if (Reverse) {
       armLockMotor.set(-1);
-  }else{
-    armLockMotor.stopMotor();
+    } else {
+      armLockMotor.stopMotor();
+    }
   }
-}
 
   @Override
   public void periodic() {
