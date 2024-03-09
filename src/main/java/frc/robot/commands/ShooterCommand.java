@@ -8,14 +8,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystem;
 
 public class ShooterCommand extends Command {
-
   private final ShooterSubsystem shooterSubsystem;
   private final boolean start;
 
   /** Creates a new ShooterCommand. */
-  public ShooterCommand(ShooterSubsystem shooterSubsystem, boolean start) {
-    this.shooterSubsystem = shooterSubsystem;
-    this.start = start;
+  public ShooterCommand() {
+    this.shooterSubsystem = ShooterSubsystem.getInstance();
+    this.start = true;
     addRequirements(shooterSubsystem);
   } 
 

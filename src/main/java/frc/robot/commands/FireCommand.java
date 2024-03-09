@@ -10,6 +10,7 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.AutoArm.PositionControl;
 import frc.robot.commands.CenterToTarget.CenterChecker;
 import frc.robot.commands.SlowArmDown.PositionController;
+import frc.robot.poseestimation.PoseEstimation;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -23,7 +24,7 @@ public class FireCommand extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
       new ParallelCommandGroup(
-          new CenterToTarget(RobotContainer.getSwerveSubsystem(), RobotContainer.getPoseEstimation(), 
+          new CenterToTarget(RobotContainer.getSwerveSubsystem(), PoseEstimation.getInstance(),
           RobotContainer.getLimelightSubsystem(), CenterChecker.CENTER),
 
           new AutoArm(RobotContainer.getArmSubsystem(), RobotContainer.getLimelightSubsystem(), PositionControl.ShouldBe)

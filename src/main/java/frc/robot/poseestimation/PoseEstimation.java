@@ -14,82 +14,54 @@ import frc.robot.RobotContainer;
 import frc.robot.Constants.DriveConstants;
 
 public class PoseEstimation {
-    
-    private SwerveDrivePoseEstimator poseEstimator;
-public static SwerveDrivePoseEstimator pposeEstimator; 
+    private static PoseEstimation instance = null;
 
+    private final SwerveDrivePoseEstimator poseEstimator;
+    private final TimeInterpolatableBuffer<Pose2d> poseHistory = TimeInterpolatableBuffer.createBuffer(1.5);
 
-   
-
-    private TimeInterpolatableBuffer<Pose2d> poseHistory = TimeInterpolatableBuffer.createBuffer(1.5);
-  private static TimeInterpolatableBuffer<Pose2d> pposeHistory = TimeInterpolatableBuffer.createBuffer(1.5);
-
-    private static final double DIFFERENTIATION_TIME = Robot.kDefaultPeriod;
+    public static PoseEstimation getInstance() {
+        if (instance == null) {
+            instance = new PoseEstimation();
+        }
+        return instance;
+    }
 
     public PoseEstimation() {
         poseEstimator = new SwerveDrivePoseEstimator(
-            DriveConstants.DRIVE_KINEMATICS,
-            RobotContainer.drivetrain.getRotation(),
-            RobotContainer.drivetrain.getModulePositions(),
-            new Pose2d(),
-            Constants.DriveConstants.ODOMETRY_STD_DEV,
-            VecBuilder.fill(0, 0, 0) // will be overwritten for each measurement
+                DriveConstants.DRIVE_KINEMATICS,
+                RobotContainer.drivetrain.getRotation(),
+                RobotContainer.drivetrain.getModulePositions(),
+                new Pose2d(),
+                Constants.DriveConstants.ODOMETRY_STD_DEV,
+                VecBuilder.fill(0, 0, 0) // will be overwritten for each measurement
         );
-
-  
-
-        pposeEstimator = new SwerveDrivePoseEstimator(
-            DriveConstants.DRIVE_KINEMATICS,
-            RobotContainer.drivetrain.getRotation(),
-            RobotContainer.drivetrain.getModulePositions(),
-            new Pose2d(),
-            Constants.DriveConstants.ODOMETRY_STD_DEV,
-            VecBuilder.fill(0, 0, 0) // will be overwritten for each measurement
-        );
-
-        
-
     }
 
     public void periodic() {
-        poseHistory.addSample(Timer.getFPGATimestamp(), poseEstimator.getEstimatedPosition());
-        pposeHistory.addSample(Timer.getFPGATimestamp(), poseEstimator.getEstimatedPosition());
-      
-        
+        poseHistory.addSample(
+                Timer.getFPGATimestamp(),
+                poseEstimator.getEstimatedPosition()
+        );
 
         RobotContainer.field.setRobotPose(getEstimatedPose());
     }
 
-
-
-
-    public void updateOdometry(Rotation2d gyro, SwerveModulePosition[] modulePositions) {
+    public void updateOdometry(
+            Rotation2d gyro,
+            SwerveModulePosition[] modulePositions
+    ) {
         poseEstimator.update(gyro, modulePositions);
     }
 
     public Pose2d getEstimatedPose() {
         return poseEstimator.getEstimatedPosition();
     }
-     
-
-    public Translation2d getEstimatedVelocity() {
-        double now = Timer.getFPGATimestamp();
-
-        Translation2d current = poseHistory.getSample(now).get().getTranslation();
-        Translation2d previous = poseHistory.getSample(now - DIFFERENTIATION_TIME).get().getTranslation();
-
-        return current.minus(previous).div(DIFFERENTIATION_TIME);
-    }
-     public static Translation2d pgetEstimatedVelocity() {
-        double now = Timer.getFPGATimestamp();
-
-        Translation2d current = pposeHistory.getSample(now).get().getTranslation();
-        Translation2d previous = pposeHistory.getSample(now - DIFFERENTIATION_TIME).get().getTranslation();
-
-        return current.minus(previous).div(DIFFERENTIATION_TIME);
-    }
 
     public void resetPose(Pose2d pose) {
-        poseEstimator.resetPosition(RobotContainer.drivetrain.getRotation(), RobotContainer.drivetrain.getModulePositions(), pose);
+        poseEstimator.resetPosition(
+                RobotContainer.drivetrain.getRotation(),
+                RobotContainer.drivetrain.getModulePositions(),
+                pose
+        );
     }
 }
