@@ -62,9 +62,7 @@ public class LimelightSubsystem extends SubsystemBase {
         return distanceFromLimelightToGoalCentimeter;
     }
 
-    //return (0.0095 * Math.pow(getTy(), 2) - 1.0182 * getTy() + 20.195);
     public double findShooterDegrees() {
-
         return (0.0095 * Math.pow(getTy(), 2) - 1.0182 * getTy() + 24.5); //24.5
     }
 

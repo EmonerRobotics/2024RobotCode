@@ -6,43 +6,41 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.ArmLockCommand;
 
 public class ArmLockSubsystem extends SubsystemBase {
-  private static ArmLockSubsystem instance = null;
+    private static ArmLockSubsystem instance = null;
 
-  private PWMVictorSPX armLockMotor;
+    private PWMVictorSPX armLockMotor;
 
-  public static ArmLockSubsystem getInstance() {
-    if (instance == null) {
-      instance = new ArmLockSubsystem();
+    public ArmLockSubsystem() {
+        armLockMotor = new PWMVictorSPX(0);
     }
-    return instance;
-  }
 
-  /** Creates a new ArmLockSubsystem. */
-  public ArmLockSubsystem() {
-    armLockMotor = new PWMVictorSPX(0);
-  }
+    public static ArmLockSubsystem getInstance() {
+        if (instance == null) {
+            instance = new ArmLockSubsystem();
+        }
+        return instance;
+    }
 
-  public void setLockMotor(boolean start){
-    if(start){
-      armLockMotor.set(1);
-  }else{
-    armLockMotor.stopMotor();
-  }
-}
+    public void setLockMotor(boolean start) {
+        if (start) {
+            armLockMotor.set(1);
+        } else {
+            armLockMotor.stopMotor();
+        }
+    }
 
-public void setReverseMotor(boolean Reverse){
-   if(Reverse){
-      armLockMotor.set(-1);
-  }else{
-    armLockMotor.stopMotor();
-  }
-}
+    public void setReverseMotor(boolean Reverse) {
+        if (Reverse) {
+            armLockMotor.set(-1);
+        } else {
+            armLockMotor.stopMotor();
+        }
+    }
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+    }
 }

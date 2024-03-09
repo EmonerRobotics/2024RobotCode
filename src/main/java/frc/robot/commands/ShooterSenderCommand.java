@@ -16,19 +16,15 @@ public class ShooterSenderCommand extends Command {
     private final MZ80 mz80 = MZ80.getInstance();
     private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
 
+    public ShooterSenderCommand() {
+        addRequirements(intakeSubsystem);
+    }
 
     public static ShooterSenderCommand getInstance() {
         if (instance == null) {
             instance = new ShooterSenderCommand();
         }
         return instance;
-    }
-
-    /**
-     * Creates a new IntakeCommand.
-     */
-    public ShooterSenderCommand() {
-        addRequirements(intakeSubsystem);
     }
 
     // Called when the command is initially scheduled.

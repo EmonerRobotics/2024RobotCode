@@ -4,14 +4,13 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.Constants;
-import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 public class PoseEstimation {
@@ -20,12 +19,7 @@ public class PoseEstimation {
     private final SwerveDrivePoseEstimator poseEstimator;
     private final TimeInterpolatableBuffer<Pose2d> poseHistory = TimeInterpolatableBuffer.createBuffer(1.5);
 
-    public static PoseEstimation getInstance() {
-        if (instance == null) {
-            instance = new PoseEstimation();
-        }
-        return instance;
-    }
+    public static Field2d field = new Field2d();
 
     public PoseEstimation() {
         poseEstimator = new SwerveDrivePoseEstimator(
@@ -38,13 +32,20 @@ public class PoseEstimation {
         );
     }
 
+    public static PoseEstimation getInstance() {
+        if (instance == null) {
+            instance = new PoseEstimation();
+        }
+        return instance;
+    }
+
     public void periodic() {
         poseHistory.addSample(
                 Timer.getFPGATimestamp(),
                 poseEstimator.getEstimatedPosition()
         );
 
-        RobotContainer.field.setRobotPose(getEstimatedPose());
+        field.setRobotPose(getEstimatedPose());
     }
 
     public void updateOdometry(

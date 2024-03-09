@@ -11,27 +11,18 @@ public class ReverseIntake extends Command {
 
     private static ReverseIntake instance = null;
 
-    private final IntakeSubsystem intakeSubsystem;
-    private final boolean reverse;
+    //TODO: if same reference is used, it will be better or not
+    private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
+
+    public ReverseIntake() {
+        addRequirements(intakeSubsystem);
+    }
 
     public static ReverseIntake getInstance() {
         if (instance == null) {
-            instance = new ReverseIntake(
-                    IntakeSubsystem.getInstance(),
-                    true
-            );
+            instance = new ReverseIntake();
         }
         return instance;
-    }
-
-    /**
-     * Creates a new ReverseIntake.
-     */
-    public ReverseIntake(IntakeSubsystem intakeSubsystem, boolean reverse) {
-        this.intakeSubsystem = intakeSubsystem;
-        this.reverse = reverse;
-        addRequirements(intakeSubsystem);
-        // Use addRequirements() here to declare subsystem dependencies.
     }
 
     // Called when the command is initially scheduled.
@@ -42,11 +33,7 @@ public class ReverseIntake extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (reverse) {
-            intakeSubsystem.setReverseMotor(true);
-        } else {
-            intakeSubsystem.setReverseMotor(false);
-        }
+        intakeSubsystem.setReverseMotor(true);
     }
 
     // Called once the command ends or is interrupted.

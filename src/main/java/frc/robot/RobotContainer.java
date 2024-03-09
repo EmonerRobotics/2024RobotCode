@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
 import frc.robot.commands.AutoArm.PositionControl;
 import frc.robot.commands.SlowArmDown.PositionController;
-import frc.robot.commands.autonomous.FRCPathPlanner;
+import frc.robot.commands.autonomous.PathPlanner;
 import frc.robot.poseestimation.PoseEstimation;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -32,12 +32,9 @@ public class RobotContainer {
     public static final Joystick swerveJoystick = new Joystick(Constants.JoystickConstants.SwerveJoystick);
     public static final Joystick upSystemJoystick = new Joystick(Constants.JoystickConstants.UpSystem);
 
-    public static Field2d field = new Field2d();
-
     public RobotContainer() {
-        FRCPathPlanner.SetPathPlannerSettings();
+        PathPlanner.setPathPlannerSettings();
         setupDefaults();
-        setupAutoBalanceStartingPosition();
         configureUpSystemJoystickBindings();
         configureSwerveJoystickBindings();
     }
@@ -52,12 +49,18 @@ public class RobotContainer {
 
         new JoystickButton(
                 upSystemJoystick,
+                2
+        ).onTrue(
+                new FireCommand()
+        );
+
+        new JoystickButton(
+                upSystemJoystick,
                 3
         ).whileTrue(
                 ReverseIntake.getInstance()
         );
 
-        //TODO: test with real robot
         new JoystickButton(
                 upSystemJoystick,
                 4
@@ -140,22 +143,6 @@ public class RobotContainer {
         ArmSubsystem.getInstance().setDefaultCommand(
                 new ArmCommand(() -> upSystemJoystick.getRawAxis(1))
         );
-    }
-
-    private void setupAutoBalanceStartingPosition() {
-        FieldObject2d autoBalanceStartingPosition = field.getObject("Auto Balance Starting Position");
-        if (autoBalanceStartingPosition.getPoses().isEmpty()) {
-            autoBalanceStartingPosition.setPose(AllianceUtils.allianceToField(
-                            new Pose2d(
-                                    new Translation2d(
-                                            0,
-                                            0
-                                    ),
-                                    new Rotation2d()
-                            )
-                    )
-            );
-        }
     }
 
 }

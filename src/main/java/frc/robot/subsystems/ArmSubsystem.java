@@ -21,16 +21,6 @@ public class ArmSubsystem extends SubsystemBase {
 
     private static ArmSubsystem instance = null;
 
-    public static ArmSubsystem getInstance() {
-        if (instance == null) {
-            instance = new ArmSubsystem();
-        }
-        return instance;
-    }
-
-    /**
-     * Creates a new ArmSubsystem.
-     */
     public ArmSubsystem() {
         armLmotor = new CANSparkMax(Constants.UpSystemConstants.armLmotorId, MotorType.kBrushless);
         armRmotor = new CANSparkMax(Constants.UpSystemConstants.armRmotorId, MotorType.kBrushless);
@@ -42,6 +32,13 @@ public class ArmSubsystem extends SubsystemBase {
 
         angleEncoder = new DutyCycleEncoder(0);
         angleEncoder.reset();
+    }
+
+    public static ArmSubsystem getInstance() {
+        if (instance == null) {
+            instance = new ArmSubsystem();
+        }
+        return instance;
     }
 
     public void manuelArmControl(double controller) {

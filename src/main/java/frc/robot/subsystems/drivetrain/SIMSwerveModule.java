@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants;
 import frc.robot.Robot;
 
-public class SIMSwerveModule implements SwerveModule{
+public class SIMSwerveModule implements SwerveModule {
 
     private final double chassisAngularOffset;
 
@@ -55,11 +55,11 @@ public class SIMSwerveModule implements SwerveModule{
     @Override
     public void update() {
         driveSim.setInputVoltage(MathUtil.clamp(driveFeedForward.calculate(desiredState.speedMetersPerSecond) +
-                drivePIDController.calculate(driveSim.getAngularVelocityRadPerSec()),
+                        drivePIDController.calculate(driveSim.getAngularVelocityRadPerSec()),
                 -12, 12));
 
         driveSim.update(Robot.kDefaultPeriod);
-        
+
         turnSim.setInputVoltage(MathUtil.clamp(
                 turnPIDController.calculate(turnAbsolutePosition),
                 -12, 12));

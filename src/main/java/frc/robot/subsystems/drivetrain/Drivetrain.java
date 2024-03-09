@@ -36,16 +36,6 @@ public class Drivetrain extends SubsystemBase {
 
     private final Gyro gyro;
 
-    public static Drivetrain getInstance() {
-        if (instance == null) {
-            instance = new Drivetrain();
-        }
-        return instance;
-    }
-
-    /**
-     * Creates a new DriveSubsystem.
-     */
     public Drivetrain() {
         if (RobotBase.isSimulation()) {
             this.swerveModules = new SwerveModules(
@@ -80,6 +70,13 @@ public class Drivetrain extends SubsystemBase {
         }
 
         gyro = (RobotBase.isReal() ? new NavXGyro() : new SIMGyro(swerveModules));
+    }
+
+    public static Drivetrain getInstance() {
+        if (instance == null) {
+            instance = new Drivetrain();
+        }
+        return instance;
     }
 
     @Override

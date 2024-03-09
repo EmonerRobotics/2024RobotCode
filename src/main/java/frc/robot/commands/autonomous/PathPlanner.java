@@ -13,15 +13,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.*;
 import frc.robot.commands.AutoArm.PositionControl;
 import frc.robot.commands.SlowArmDown.PositionController;
-import frc.robot.subsystems.ArmSubsystem;
 
 
-public class FRCPathPlanner {
+public class PathPlanner {
     public final static SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
 
-    public static void SetPathPlannerSettings() {
+    public static void setPathPlannerSettings() {
         setDashboard();
-        CommandNameEntry();
+        commandNameEntry();
     }
 
     public static void setDashboard() {
@@ -30,7 +29,7 @@ public class FRCPathPlanner {
         SmartDashboard.putBoolean("is pathfinding configure?", AutoBuilder.isPathfindingConfigured());
     }
 
-    public static void CommandNameEntry() {
+    public static void commandNameEntry() {
         NamedCommands.registerCommand("intake", IntakeCommand.getInstance());
         //NamedCommands.registerCommand("fire", new FireCommand());
         NamedCommands.registerCommand("shooter", ShooterCommand.getInstance());

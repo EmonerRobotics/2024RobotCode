@@ -9,20 +9,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class MZ80 extends SubsystemBase {
-
     private static MZ80 instance = null;
+
+    private final DigitalInput sensor;
+
+    public MZ80() {
+        sensor = new DigitalInput(9);
+    }
 
     public static MZ80 getInstance() {
         if (instance == null) {
             instance = new MZ80();
         }
         return instance;
-    }
-
-    private final DigitalInput sensor;
-
-    public MZ80() {
-        sensor = new DigitalInput(9);
     }
 
     public boolean isSenorDistanceReached() {

@@ -18,10 +18,6 @@ public class AutoArm extends Command {
     private final PIDController pidController;
     private PositionControl positionControl;
 
-    /**
-     * Creates a new AutoArm.
-     */
-    //PositionControl positionControl
     public AutoArm(PositionControl positionControl) {
         this.pidController = new PIDController(
                 0.06,

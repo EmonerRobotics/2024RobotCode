@@ -9,52 +9,41 @@ import frc.robot.subsystems.ArmLockSubsystem;
 
 public class ReverseArmLock extends Command {
 
-  private static ReverseArmLock instance = null;
+    private static ReverseArmLock instance = null;
 
-  public ArmLockSubsystem armLockSubsystem;
-  public boolean reverse;
+    public ArmLockSubsystem armLockSubsystem = ArmLockSubsystem.getInstance();
+
+    public ReverseArmLock() {
+        addRequirements(armLockSubsystem);
+    }
 
     public static ReverseArmLock getInstance() {
         if (instance == null) {
-        instance = new ReverseArmLock(
-            ArmLockSubsystem.getInstance(),
-            true
-        );
+            instance = new ReverseArmLock();
         }
         return instance;
     }
 
-  /** Creates a new IntakeLockCommand. */
-  public ReverseArmLock(ArmLockSubsystem armLockSubsystem, boolean reverse) {
-    this.armLockSubsystem = armLockSubsystem;
-    this.reverse = reverse;
-    addRequirements(armLockSubsystem);
-    // Use addRequirements() here to declare subsystem dependencies.
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {}
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    if(reverse){
-      armLockSubsystem.setReverseMotor(true);
-    }else{
-      armLockSubsystem.setReverseMotor(false);
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
     }
-  }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    armLockSubsystem.setLockMotor(false);
-  }
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        armLockSubsystem.setReverseMotor(true);
+    }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        armLockSubsystem.setLockMotor(false);
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
 }

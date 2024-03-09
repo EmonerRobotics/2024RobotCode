@@ -11,27 +11,18 @@ public class ArmLockCommand extends Command {
 
     private static ArmLockCommand instance = null;
 
-    public ArmLockSubsystem armLockSubsystem;
-    public boolean start;
+    public ArmLockSubsystem armLockSubsystem = ArmLockSubsystem.getInstance();
+
+    public ArmLockCommand() {
+        addRequirements(armLockSubsystem);
+        // Use addRequirements() here to declare subsystem dependencies.
+    }
 
     public static ArmLockCommand getInstance() {
         if (instance == null) {
-            instance = new ArmLockCommand(
-                    ArmLockSubsystem.getInstance(),
-                    true
-            );
+            instance = new ArmLockCommand();
         }
         return instance;
-    }
-
-    /**
-     * Creates a new IntakeLockCommand.
-     */
-    public ArmLockCommand(ArmLockSubsystem armLockSubsystem, boolean start) {
-        this.armLockSubsystem = armLockSubsystem;
-        this.start = start;
-        addRequirements(armLockSubsystem);
-        // Use addRequirements() here to declare subsystem dependencies.
     }
 
     // Called when the command is initially scheduled.
@@ -42,11 +33,7 @@ public class ArmLockCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (start) {
-            armLockSubsystem.setLockMotor(true);
-        } else {
-            armLockSubsystem.setLockMotor(false);
-        }
+        armLockSubsystem.setLockMotor(true);
     }
 
     // Called once the command ends or is interrupted.
