@@ -92,7 +92,7 @@ public class ShooterSenderCommand extends Command {
   @Override
   public boolean isFinished() {
 
-    if(mz80.sensorget()){
+    if(mz80.isSenorDistanceReached()){
       return false;
     }else{
       return true;

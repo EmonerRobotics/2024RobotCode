@@ -6,7 +6,6 @@ package frc.robot.commands;
 
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MZ80;
 
@@ -18,9 +17,6 @@ public class IntakeCommand extends Command {
     private boolean start;
     private boolean isCommandEnd = false;
 
-    /**
-     * Creates a new IntakeCommand.
-     */
     public IntakeCommand(IntakeSubsystem intakeSubsystem, MZ80 mz80, boolean start) {
         this.intakeSubsystem = intakeSubsystem;
         this.mz80 = mz80;
@@ -47,33 +43,25 @@ public class IntakeCommand extends Command {
 
     @Override
     public void execute() {
+        boolean isSensorDistanceReached = mz80.isSenorDistanceReached();
         if (start) {
-           if (mz80.sensorget() == true) {
-              intakeSubsystem.setMotor(false);
-              isCommandEnd = true;
-            }else {
-                intakeSubsystem.setMotor(true);
-                isCommandEnd = false;
-            }
-          
+          intakeSubsystem.setMotor(!isSensorDistanceReached);
+          isCommandEnd = isSensorDistanceReached;
         } else {
-            intakeSubsystem.setMotor(false);
+            intakeSubsystem.setMotor(isSensorDistanceReached);
         }
 
     }
-
-
  
     @Override
     public void end(boolean interrupted) {
         intakeSubsystem.setMotor(false);
     }
 
-  
     @Override
     public boolean isFinished() {
         System.out.println("-----ultrasonic sensor");
-        System.out.println(String.valueOf(mz80.sensorget()));
+        System.out.println(String.valueOf(mz80.isSenorDistanceReached()));
         return isCommandEnd;
   
     }

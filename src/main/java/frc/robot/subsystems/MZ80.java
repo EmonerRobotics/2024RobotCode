@@ -31,7 +31,7 @@ public class MZ80 extends SubsystemBase {
         // sensorA = new AnalogInput(0);
     }
 
-    public boolean sensorget() {
+    public boolean isSenorDistanceReached() {
         return !sensor.get();
     }
 
