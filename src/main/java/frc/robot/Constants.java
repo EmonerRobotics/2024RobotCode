@@ -37,9 +37,6 @@ public final class Constants {
         public static final double setIntakeMotorSpeed = 0.5;
         public static final double setReverseIntakeMotorSpeed = -0.5;
 
-        public static final int ShooterStarterB = 6;
-        public static final int IntakeStarterB = 5;
-
         public static final int intakeMotorPWM = 1;
         public static final int intake1MotorPWM = 2;
     }
@@ -71,15 +68,6 @@ public final class Constants {
         public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 0;
         public static final double REAR_LEFT_CHASSIS_ANGULAR_OFFSET = Math.PI;
         public static final double REAR_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI / 2;
-
-        // Charge Station Constants
-        public static final double CHARGE_TIPPING_ANGLE = Math.toRadians(12);
-        public static final double CHARGE_TOLERANCE = Math.toRadians(2.5);
-        public static final double CHARGE_MAX_SPEED = 0.8;
-        public static final double CHARGE_REDUCED_SPEED = 0.70;
-
-        // Delay between reading the gyro and using the value used to aproximate exact angle while spinning (0.02 is one loop)
-        public static final double GYRO_READ_DELAY = 0.02;
 
         // SPARK MAX CAN IDs
         public static final int FRONT_LEFT_DRIVING_CAN_ID = 2; //7

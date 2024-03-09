@@ -17,18 +17,11 @@ public class FireCommand extends SequentialCommandGroup {
     public FireCommand() {
         addCommands(
                 new ParallelCommandGroup(
-                        new CenterToTarget(Drivetrain.getInstance(), PoseEstimation.getInstance(),
-                                LimelightSubsystem.getInstance(), CenterChecker.CENTER),
-
-                        new AutoArm(
-                                ArmSubsystem.getInstance(),
-                                LimelightSubsystem.getInstance(), PositionControl.ShouldBe)
+                        new CenterToTarget(CenterChecker.CENTER),
+                        new AutoArm(PositionControl.ShouldBe)
                 ),
                 ShooterSenderCommand.getInstance(),
-                new SlowArmDown(
-                        ArmSubsystem.getInstance(),
-                        PositionController.Zero
-                )
+                new SlowArmDown(PositionController.Zero)
         );
 
     }

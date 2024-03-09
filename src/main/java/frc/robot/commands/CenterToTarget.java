@@ -15,23 +15,20 @@ import frc.robot.utils.AllianceUtils;
 
 public class CenterToTarget extends Command {
 
-  private final LimelightSubsystem limelightSubsystem;
+  private final LimelightSubsystem limelightSubsystem = LimelightSubsystem.getInstance();
   private final PIDController pidController;
-  private final Drivetrain drivetrain;
-  private final PoseEstimation poseEstimation;
+  private final Drivetrain drivetrain = Drivetrain.getInstance();
+  private final PoseEstimation poseEstimation = PoseEstimation.getInstance();
   private Rotation2d fieldOrientationZeroOffset = new Rotation2d();
   private final CenterChecker centerChecker;
   private double speedY;
 
-  public static enum CenterChecker{
+  public enum CenterChecker{
     CENTER
   }
  
   /** Creates a new CenterToTarget. */
-  public CenterToTarget(Drivetrain drivetrain, PoseEstimation poseEstimation, LimelightSubsystem limelightSubsystem, CenterChecker centerChecker) {
-    this.drivetrain = drivetrain;
-    this.poseEstimation = poseEstimation;
-    this.limelightSubsystem = limelightSubsystem;
+  public CenterToTarget(CenterChecker centerChecker) {
     this.centerChecker = centerChecker;
     this.pidController = new PIDController(0.03, 0.02, 0);
     addRequirements(limelightSubsystem);

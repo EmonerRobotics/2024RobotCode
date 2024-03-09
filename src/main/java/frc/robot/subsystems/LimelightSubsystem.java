@@ -24,10 +24,6 @@ public class LimelightSubsystem extends SubsystemBase {
         return instance;
     }
 
-    /**
-     * Creates a new LimelightSubsystem.
-     */
-
     @Override
     public void periodic() {
         EstimatedDistance();
@@ -71,24 +67,6 @@ public class LimelightSubsystem extends SubsystemBase {
 
         return (0.0095 * Math.pow(getTy(), 2) - 1.0182 * getTy() + 24.5); //24.5
     }
-
-  /*
-  public double findHypotenuse(){
-    double height = Math.pow(210, 2); 
-    double distance = EstimatedDistance();
-    //Math.pow(EstimatedDistance(), 2);
-    //return height;
-    return (height + distance); 
-     
-  } */
-
-  /*
-  public double findShooterDegrees(){
-    double sinAlpha =  90 - (EstimatedDistance() / findHypotenuse());
-    double degrees = Math.toDegrees(Math.cos(sinAlpha));
-    return degrees * -1;
-  }
-   */
 
     public double getId() {
         NetworkTableEntry tid = table.getEntry("tid");

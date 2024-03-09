@@ -10,19 +10,19 @@ import frc.robot.subsystems.ArmSubsystem;
 
 public class SlowArmDown extends Command {
 
-  public static enum PositionController{
+  public enum PositionController{
     ShouldBe,
     Zero
   }
 
-  private final ArmSubsystem armSubsystem;
+  private final ArmSubsystem armSubsystem = ArmSubsystem.getInstance();
   private final PIDController pidController;
   private final PositionController positionController;
 
   /** Creates a new AutoArm. */
   //PositionControl positionControl
-  public SlowArmDown(ArmSubsystem armSubsystem,  PositionController positionController) {
-    this.armSubsystem = armSubsystem;
+  public SlowArmDown(PositionController positionController) {
+
     this.pidController = new PIDController(0.02, 0.001, 0);
     this.positionController = positionController; 
     addRequirements(armSubsystem);

@@ -34,17 +34,11 @@ public class FRCPathPlanner {
         NamedCommands.registerCommand("intake", IntakeCommand.getInstance());
         //NamedCommands.registerCommand("fire", new FireCommand());
         NamedCommands.registerCommand("shooter", ShooterCommand.getInstance());
-        NamedCommands.registerCommand("slowArm", new SlowArmDown(
-                        ArmSubsystem.getInstance(),
-                        PositionController.ShouldBe
-                )
+        NamedCommands.registerCommand("slowArm", new SlowArmDown(PositionController.ShouldBe)
         );
         NamedCommands.registerCommand("sender", ShooterSenderCommand.getInstance());
         NamedCommands.registerCommand("autoArm", AutoArm.getInstance(PositionControl.auto));
-        NamedCommands.registerCommand("zeroArm", new SlowArmDown(
-                        ArmSubsystem.getInstance(),
-                        PositionController.Zero
-                )
+        NamedCommands.registerCommand("zeroArm", new SlowArmDown(PositionController.Zero)
         );
     }
 

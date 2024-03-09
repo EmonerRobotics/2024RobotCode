@@ -11,106 +11,46 @@ import frc.robot.subsystems.MZ80;
 
 public class ShooterSenderCommand extends Command {
 
-  private static ShooterSenderCommand instance = null;
+    private static ShooterSenderCommand instance = null;
 
-  private final MZ80 mz80;
-  private final IntakeSubsystem intakeSubsystem;
-  private boolean start;
-  
+    private final MZ80 mz80 = MZ80.getInstance();
+    private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
+
 
     public static ShooterSenderCommand getInstance() {
         if (instance == null) {
-        instance = new ShooterSenderCommand(
-                IntakeSubsystem.getInstance(),
-                MZ80.getInstance(),
-                true
-        );
+            instance = new ShooterSenderCommand();
         }
         return instance;
     }
 
-  /** Creates a new IntakeCommand. */
-  public ShooterSenderCommand(IntakeSubsystem intakeSubsystem, MZ80 mz80, boolean start) {
-    this.intakeSubsystem = intakeSubsystem;
-    this.mz80 = mz80;
-    this.start = start;
-    addRequirements(intakeSubsystem);
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {}
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    
-    if(start){
-      intakeSubsystem.setMotor(true);
-    }else{
-      intakeSubsystem.setMotor(false);
+    /**
+     * Creates a new IntakeCommand.
+     */
+    public ShooterSenderCommand() {
+        addRequirements(intakeSubsystem);
     }
 
-    /*
-
-    if(start && mz80.sensorget() == true){
-      intakeSubsystem.setMotor(true);
-    }else{
-      intakeSubsystem.setMotor(false);
-    }  */
-
-    /*
-    
-    if(start){
-      intakeSubsystem.setMotor(start);
-      if(colorDetection.getColor() == "Orange"){
-        intakeSubsystem.setMotor(!start);
-        stop = true;
-        start = false;
-      }else{
-        intakeSubsystem.setMotor(start);
-        stop = false;
-      }
-    }else{
-      intakeSubsystem.setMotor(!start);
-      stop =  true;
-      start = false;
-       */
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
     }
 
-    //SmartDashboard.putBoolean("START", start);
-    //SmartDashboard.putBoolean("STOP", stop);
-  
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    intakeSubsystem.setMotor(false);
-  }
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-
-    if(mz80.isSenorDistanceReached()){
-      return false;
-    }else{
-      return true;
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        intakeSubsystem.setMotor(true);
     }
 
-    /* 
-    if(mz80.sensorget()==false){
-      return true;
-    }else{
-      return false;*/
-    //}
-    //return start ? false : true;
-    
-    /*
-    if(stop){
-      return true;
-    }else{
-      return false;
-    } */
-  }
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        intakeSubsystem.setMotor(false);
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return !mz80.isSenorDistanceReached();
+    }
 }

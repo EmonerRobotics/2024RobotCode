@@ -18,8 +18,6 @@ import frc.robot.commands.SlowArmDown.PositionController;
 import frc.robot.commands.autonomous.FRCPathPlanner;
 import frc.robot.poseestimation.PoseEstimation;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.MZ80;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.utils.AllianceUtils;
 
@@ -36,18 +34,116 @@ public class RobotContainer {
 
     public static Field2d field = new Field2d();
 
-    private final FieldObject2d autoBalanceStartingPosition = field.getObject("Auto Balance Starting Position");
-
-    private DriveWithJoysticks driveCommand = DriveWithJoysticks.getInstance();
-
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
     public RobotContainer() {
         FRCPathPlanner.SetPathPlannerSettings();
-        driveCommand.setJoystickTranslation(swerveJoystick);
-        Drivetrain.getInstance().setDefaultCommand(driveCommand);
+        setupDefaults();
+        setupAutoBalanceStartingPosition();
+        configureUpSystemJoystickBindings();
+        configureSwerveJoystickBindings();
+    }
 
+    private void configureUpSystemJoystickBindings() {
+        new JoystickButton(
+                upSystemJoystick,
+                1
+        ).whileTrue(
+                ShooterSenderCommand.getInstance()
+        );
+
+        new JoystickButton(
+                upSystemJoystick,
+                3
+        ).whileTrue(
+                ReverseIntake.getInstance()
+        );
+
+        //TODO: test with real robot
+        new JoystickButton(
+                upSystemJoystick,
+                4
+        ).whileTrue(
+                AutoArm.getInstance(PositionControl.Amphi)
+        );
+
+        new JoystickButton(
+                upSystemJoystick,
+                5
+        ).whileTrue(
+                IntakeCommand.getInstance()
+        );
+
+        new JoystickButton(
+                upSystemJoystick,
+                6
+        ).whileTrue(
+                ShooterCommand.getInstance()
+        );
+
+        new JoystickButton(
+                upSystemJoystick,
+                9
+        ).whileTrue(
+                ReverseArmLock.getInstance()
+        );
+    }
+
+    private void configureSwerveJoystickBindings() {
+        new JoystickButton(
+                swerveJoystick,
+                8
+        ).whileTrue(
+                new RunCommand(
+                        Drivetrain.getInstance()::setX,
+                        Drivetrain.getInstance()
+                )
+        );
+
+        new JoystickButton(
+                swerveJoystick,
+                9
+        ).onTrue(
+                new InstantCommand(() -> {
+                    PoseEstimation.getInstance().resetPose(
+                            new Pose2d(
+                                    PoseEstimation.getInstance().getEstimatedPose().getTranslation(),
+                                    new Rotation2d()
+                            )
+                    );
+                })
+        );
+
+        new JoystickButton(
+                swerveJoystick,
+                10
+        ).whileTrue(
+                ArmLockCommand.getInstance()
+        );
+
+    }
+
+    public Command getAutonomousCommand() {
+        return new ParallelCommandGroup(
+                ShooterCommand.getInstance(),
+                new SequentialCommandGroup(
+                        new SlowArmDown(PositionController.ShouldBe),
+                        new WaitCommand(0.3),
+                        new ShooterSenderCommand(),
+                        new SlowArmDown(PositionController.Zero)
+                )
+        );
+
+    }
+
+    private void setupDefaults() {
+        Drivetrain.getInstance().setDefaultCommand(DriveWithJoysticks.getInstance(swerveJoystick));
+
+        ArmSubsystem.getInstance().setDefaultCommand(
+                new ArmCommand(() -> upSystemJoystick.getRawAxis(1))
+        );
+    }
+
+    private void setupAutoBalanceStartingPosition() {
+        FieldObject2d autoBalanceStartingPosition = field.getObject("Auto Balance Starting Position");
         if (autoBalanceStartingPosition.getPoses().isEmpty()) {
             autoBalanceStartingPosition.setPose(AllianceUtils.allianceToField(
                             new Pose2d(
@@ -60,78 +156,6 @@ public class RobotContainer {
                     )
             );
         }
-        configureBindings();
-
-        ArmSubsystem.getInstance().setDefaultCommand(
-                new ArmCommand(
-                        ArmSubsystem.getInstance(),
-                        () -> upSystemJoystick.getRawAxis(1)
-                )
-        );
-    }
-
-    private void configureBindings() {
-        new JoystickButton(
-                upSystemJoystick,
-                Constants.UpSystemConstants.ShooterStarterB
-        ).whileTrue(
-                ShooterCommand.getInstance()
-        );
-
-        new JoystickButton(
-                upSystemJoystick,
-                5).whileTrue(
-                IntakeCommand.getInstance()
-        );
-
-        new JoystickButton(
-                upSystemJoystick,
-                1).whileTrue(
-                ShooterSenderCommand.getInstance()
-        );
-
-        new JoystickButton(
-                upSystemJoystick,
-                3).whileTrue(
-                ReverseIntake.getInstance()
-        );
-
-        //TODO: test with real robot
-        new JoystickButton(upSystemJoystick, 4).whileTrue(
-                AutoArm.getInstance(PositionControl.Amphi)
-        );
-
-        new JoystickButton(swerveJoystick, 10).whileTrue(
-                ArmLockCommand.getInstance());
-
-        new JoystickButton(upSystemJoystick, 9).whileTrue(
-                ReverseArmLock.getInstance());
-
-        new JoystickButton(swerveJoystick, 9).
-                onTrue(new InstantCommand(() -> PoseEstimation.getInstance().resetPose(
-                        new Pose2d(
-                                PoseEstimation.getInstance().getEstimatedPose().getTranslation(),
-                                new Rotation2d()))));
-
-        new JoystickButton(swerveJoystick, 8).
-                whileTrue(new RunCommand(
-                        Drivetrain.getInstance()::setX,
-                        Drivetrain.getInstance()));
-
-    }
-
-    public Command getAutonomousCommand() {
-        return new ParallelCommandGroup(
-                ShooterCommand.getInstance(),
-                new SequentialCommandGroup(
-                        new SlowArmDown(ArmSubsystem.getInstance(), PositionController.ShouldBe),
-                        new WaitCommand(0.3),
-                        new ShooterSenderCommand(IntakeSubsystem.getInstance(), MZ80.getInstance(), true),
-                        new SlowArmDown(ArmSubsystem.getInstance(), PositionController.Zero)
-                )
-        );
-
-
     }
 
 }

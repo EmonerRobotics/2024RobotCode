@@ -15,9 +15,9 @@ import frc.robot.Constants;
 
 public class ArmSubsystem extends SubsystemBase {
 
-    private CANSparkMax armLmotor;
-    private CANSparkMax armRmotor;
-    private DutyCycleEncoder m_angleEncoder;
+    private final CANSparkMax armLmotor;
+    private final CANSparkMax armRmotor;
+    private final DutyCycleEncoder angleEncoder;
 
     private static ArmSubsystem instance = null;
 
@@ -40,9 +40,8 @@ public class ArmSubsystem extends SubsystemBase {
         armLmotor.setIdleMode(IdleMode.kBrake);
         armRmotor.setIdleMode(IdleMode.kBrake);
 
-        //m_angleEncoder = armLmotor.get
-        m_angleEncoder = new DutyCycleEncoder(0);
-        m_angleEncoder.reset();
+        angleEncoder = new DutyCycleEncoder(0);
+        angleEncoder.reset();
     }
 
     public void manuelArmControl(double controller) {
@@ -51,7 +50,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public double getEncoderDegrees() {
-        return ((m_angleEncoder.getAbsolutePosition() * 360) - 39);
+        return ((angleEncoder.getAbsolutePosition() * 360) - 39);
     }
 
     @Override

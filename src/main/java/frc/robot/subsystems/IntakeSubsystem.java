@@ -38,13 +38,6 @@ public class IntakeSubsystem extends SubsystemBase {
             intakeMotor.stopMotor();
             intake1Motor.stopMotor();
         }
-    
-    /* 
-    if(start){
-      intakeMotor.set(Constants.UpSystemConstants.setIntakeMotorSpeed);
-    }else{
-      intakeMotor.stopMotor();
-    }*/
     }
 
     public final void setReverseMotor(boolean reverse) {

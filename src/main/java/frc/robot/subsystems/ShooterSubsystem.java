@@ -14,8 +14,8 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 public class ShooterSubsystem extends SubsystemBase {
 
   private static ShooterSubsystem instance = null;
-  private CANSparkMax shooterRmotor;
-  private CANSparkMax shooterLmotor;
+  private final CANSparkMax shooterRmotor;
+  private final CANSparkMax shooterLmotor;
 
   public static ShooterSubsystem getInstance() {
     if (instance == null) {
@@ -24,12 +24,11 @@ public class ShooterSubsystem extends SubsystemBase {
     return instance;
   }
 
-  /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() {
     shooterRmotor = new CANSparkMax(Constants.UpSystemConstants.rShooterMotorId, MotorType.kBrushless); //ID:10
     shooterLmotor = new CANSparkMax(Constants.UpSystemConstants.lShooterMotorId, MotorType.kBrushless); //ID:11
     
-    //Sets motor controller idle settings to brake 
+    //Sets motor controller idle settings to brake
     shooterRmotor.setIdleMode(IdleMode.kBrake);
     shooterLmotor.setIdleMode(IdleMode.kBrake);
   }

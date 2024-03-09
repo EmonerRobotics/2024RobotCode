@@ -11,12 +11,11 @@ import frc.robot.subsystems.ArmSubsystem;
 
 public class ArmCommand extends Command {
 
-  private final ArmSubsystem armSubsystem;
+  private final ArmSubsystem armSubsystem = ArmSubsystem.getInstance();
   private final Supplier<Double> controller;
 
   /** Creates a new ArmCommand. */
-  public ArmCommand(ArmSubsystem armSubsystem, Supplier<Double> controller) {
-    this.armSubsystem = armSubsystem;
+  public ArmCommand(Supplier<Double> controller) {
     this.controller = controller;
     addRequirements(armSubsystem);
   }

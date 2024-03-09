@@ -26,10 +26,13 @@ public class DriveWithJoysticks extends Command {
         Drivetrain.getInstance().resetEncoders();
     }
 
-    public static DriveWithJoysticks getInstance() {
+    public static DriveWithJoysticks getInstance(
+            Joystick translation
+    ) {
         if (instance == null) {
             instance = new DriveWithJoysticks();
         }
+        instance.setJoystickTranslation(translation);
         return instance;
     }
 

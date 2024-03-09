@@ -13,20 +13,16 @@ import frc.robot.subsystems.LimelightSubsystem;
 public class AutoArm extends Command {
 
     private static AutoArm instance = null;
-    private final ArmSubsystem armSubsystem;
-    private final LimelightSubsystem limelightSubsystem;
+    private final ArmSubsystem armSubsystem = ArmSubsystem.getInstance();
+    private final LimelightSubsystem limelightSubsystem = LimelightSubsystem.getInstance();
     private final PIDController pidController;
     private PositionControl positionControl;
+
     /**
      * Creates a new AutoArm.
      */
     //PositionControl positionControl
-    public AutoArm(ArmSubsystem armSubsystem,
-                   LimelightSubsystem limelightSubsystem,
-                   PositionControl positionControl
-    ) {
-        this.armSubsystem = armSubsystem;
-        this.limelightSubsystem = limelightSubsystem;
+    public AutoArm(PositionControl positionControl) {
         this.pidController = new PIDController(
                 0.06,
                 0.025,
@@ -40,11 +36,7 @@ public class AutoArm extends Command {
             PositionControl positionControl
     ) {
         if (instance == null) {
-            instance = new AutoArm(
-                    ArmSubsystem.getInstance(),
-                    LimelightSubsystem.getInstance(),
-                    positionControl
-            );
+            instance = new AutoArm(positionControl);
         }
         instance.positionControl = positionControl;
         return instance;
