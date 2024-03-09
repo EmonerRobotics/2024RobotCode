@@ -67,7 +67,7 @@ public class RobotContainer {
     private DriveWithJoysticks driveCommand = new DriveWithJoysticks(drivetrain, PoseEstimation.getInstance(), joystick1);
     //private AutoBalance autoBalanceCommand = new AutoBalance(drivetrain);
     public static final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-    public static final ArmSubsystem armSubsystem = new ArmSubsystem();
+
     public static final ArmLockSubsystem armlocksubsystem = new ArmLockSubsystem();
     public static final LimelightSubsystem limelightSubsystem = new LimelightSubsystem();
     public static final MZ80 mz80 = new MZ80();
@@ -86,7 +86,7 @@ public class RobotContainer {
         }
         configureBindings();
 
-        armSubsystem.setDefaultCommand(new ArmCommand(armSubsystem, () -> joystick2.getRawAxis(1)));
+        ArmSubsystem.getInstance().setDefaultCommand(new ArmCommand(ArmSubsystem.getInstance(), () -> joystick2.getRawAxis(1)));
     }
 
     private void configureBindings() {
@@ -117,7 +117,7 @@ public class RobotContainer {
         //new JoystickButton(joystick2, 2).onTrue(new FireCommand());
 
         new JoystickButton(joystick2, 2).onTrue(new SequentialCommandGroup(
-                new AutoArm(armSubsystem, limelightSubsystem, PositionControl.auto),
+                new AutoArm(ArmSubsystem.getInstance(), limelightSubsystem, PositionControl.auto),
                 new ShooterSenderCommand(intakeSubsystem, mz80, true)));
 
         //Kanca kilit
@@ -144,10 +144,10 @@ public class RobotContainer {
         return new ParallelCommandGroup(
                 new ShooterCommand(),
                 new SequentialCommandGroup(
-                        new SlowArmDown(armSubsystem, PositionController.ShouldBe),
+                        new SlowArmDown(ArmSubsystem.getInstance(), PositionController.ShouldBe),
                         new WaitCommand(0.3),
                         new ShooterSenderCommand(intakeSubsystem, mz80, true),
-                        new SlowArmDown(armSubsystem, PositionController.Zero)
+                        new SlowArmDown(ArmSubsystem.getInstance(), PositionController.Zero)
                 )
         );
 
@@ -163,7 +163,7 @@ public class RobotContainer {
     }
 
     public static ArmSubsystem getArmSubsystem() {
-        return armSubsystem;
+        return ArmSubsystem.getInstance();
     }
 
     public static IntakeSubsystem getIntakeSubsystem() {
