@@ -32,7 +32,7 @@ public class MZ80 extends SubsystemBase {
     }
 
     public boolean sensorget() {
-        return !sensor.get();
+        return sensor.get();
     }
 
     @Override

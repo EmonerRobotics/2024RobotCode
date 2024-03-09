@@ -47,33 +47,14 @@ public class IntakeCommand extends Command {
     @Override
     public void execute() {
         if (start) {
-            intakeSubsystem.setMotor(true);
+            if (mz80.sensorget()) {
+                intakeSubsystem.setMotor(true);
+            }
         } else {
             intakeSubsystem.setMotor(false);
         }
 
-    /*
-    
-    if(start){
-      intakeSubsystem.setMotor(start);
-      if(colorDetection.getColor() == "Orange"){
-        intakeSubsystem.setMotor(!start);
-        stop = true;
-        start = false;
-      }else{
-        intakeSubsystem.setMotor(start);
-        stop = false;
-      }
-    }else{
-      intakeSubsystem.setMotor(!start);
-      stop =  true;
-      start = false;
-       */
     }
-
-    //SmartDashboard.putBoolean("START", start);
-    //SmartDashboard.putBoolean("STOP", stop);
-
 
     // Called once the command ends or is interrupted.
     @Override
@@ -81,21 +62,4 @@ public class IntakeCommand extends Command {
         intakeSubsystem.setMotor(false);
     }
 
-    // Returns true when the command should end.
-    @Override
-    public boolean isFinished() {
-        if (mz80.sensorget() == true) {
-            return true;
-        } else {
-            return false;
-        }
-        //return start ? false : true;
-    
-    /*
-    if(stop){
-      return true;
-    }else{
-      return false;
-    } */
-    }
 }
