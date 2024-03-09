@@ -7,41 +7,16 @@ package frc.robot.commands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.poseestimation.PoseEstimation;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
 
 public class AutoArm extends Command {
-
-    public enum PositionControl {
-        ShouldBe,
-        Amphi,
-        auto
-    }
 
     private static AutoArm instance = null;
     private final ArmSubsystem armSubsystem;
     private final LimelightSubsystem limelightSubsystem;
     private final PIDController pidController;
     private PositionControl positionControl;
-
-    public static AutoArm getInstance(
-
-    ) {
-        if (instance == null) {
-            instance = new AutoArm(
-                    ArmSubsystem.getInstance(),
-                    LimelightSubsystem.getInstance(),
-                    PositionControl.Amphi
-            );
-        }
-        return instance;
-    }
-
-    public void setPositionControl(PositionControl positionControl) {
-        this.positionControl = positionControl;
-    }
-
     /**
      * Creates a new AutoArm.
      */
@@ -59,6 +34,24 @@ public class AutoArm extends Command {
         );
         this.positionControl = positionControl;
         addRequirements(armSubsystem);
+    }
+
+    public static AutoArm getInstance(
+            PositionControl positionControl
+    ) {
+        if (instance == null) {
+            instance = new AutoArm(
+                    ArmSubsystem.getInstance(),
+                    LimelightSubsystem.getInstance(),
+                    positionControl
+            );
+        }
+        instance.positionControl = positionControl;
+        return instance;
+    }
+
+    public void setPositionControl(PositionControl positionControl) {
+        this.positionControl = positionControl;
     }
 
     // Called when the command is initially scheduled.
@@ -128,5 +121,11 @@ public class AutoArm extends Command {
         } else {
             return false;
         }
+    }
+
+    public enum PositionControl {
+        ShouldBe,
+        Amphi,
+        auto
     }
 }

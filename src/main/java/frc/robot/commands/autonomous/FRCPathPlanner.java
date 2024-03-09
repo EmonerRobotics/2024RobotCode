@@ -10,18 +10,10 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RobotContainer;
-import frc.robot.commands.AutoArm;
-import frc.robot.commands.FireCommand;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.ShooterCommand;
-import frc.robot.commands.ShooterSenderCommand;
-import frc.robot.commands.SlowArmDown;
+import frc.robot.commands.*;
 import frc.robot.commands.AutoArm.PositionControl;
 import frc.robot.commands.SlowArmDown.PositionController;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.MZ80;
 
 
 public class FRCPathPlanner {
@@ -48,8 +40,7 @@ public class FRCPathPlanner {
                 )
         );
         NamedCommands.registerCommand("sender", ShooterSenderCommand.getInstance());
-        NamedCommands.registerCommand("autoArm", AutoArm.getInstance());
-        AutoArm.getInstance().setPositionControl(PositionControl.auto);
+        NamedCommands.registerCommand("autoArm", AutoArm.getInstance(PositionControl.auto));
         NamedCommands.registerCommand("zeroArm", new SlowArmDown(
                         ArmSubsystem.getInstance(),
                         PositionController.Zero
