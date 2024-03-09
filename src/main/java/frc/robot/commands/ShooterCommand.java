@@ -8,8 +8,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystem;
 
 public class ShooterCommand extends Command {
+
+  private static ShooterCommand instance = null;
   private final ShooterSubsystem shooterSubsystem;
   private final boolean start;
+
+  public static ShooterCommand getInstance() {
+    if (instance == null) {
+      instance = new ShooterCommand();
+    }
+    return instance;
+  }
 
   /** Creates a new ShooterCommand. */
   public ShooterCommand() {

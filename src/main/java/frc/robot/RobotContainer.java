@@ -66,11 +66,8 @@ public class RobotContainer {
 
     private DriveWithJoysticks driveCommand = new DriveWithJoysticks(drivetrain, PoseEstimation.getInstance(), joystick1);
     //private AutoBalance autoBalanceCommand = new AutoBalance(drivetrain);
-    public static final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-
     public static final ArmLockSubsystem armlocksubsystem = new ArmLockSubsystem();
     public static final LimelightSubsystem limelightSubsystem = new LimelightSubsystem();
-    public static final MZ80 mz80 = new MZ80();
 
 
     /**
@@ -90,40 +87,39 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        //Shooter Subsystem
         new JoystickButton(
                 joystick2,
-                Constants.UpSystemConstants.ShooterStarterB).whileTrue(
-                new ShooterCommand()
+                Constants.UpSystemConstants.ShooterStarterB
+        ).whileTrue(
+                ShooterCommand.getInstance()
         );
 
-        //Intake
-        new JoystickButton(joystick2, 5).whileTrue(new IntakeCommand(intakeSubsystem, mz80, true));
+        new JoystickButton(
+                joystick2,
+                5).whileTrue(
+                IntakeCommand.getInstance()
+        );
 
-        //new JoystickButton(joystick1, 2).whileTrue(new )
+        new JoystickButton(
+                joystick2,
+                1).whileTrue(
+                ShooterSenderCommand.getInstance()
+        );
 
-        //Kontrolsuz Intake
-        new JoystickButton(joystick2, 1).whileTrue(new ShooterSenderCommand(intakeSubsystem, mz80, true));
+        new JoystickButton(
+                joystick2,
+                3).whileTrue(
+                ReverseIntake.getInstance()
+        );
 
-        //Intake Reverse
-        new JoystickButton(joystick2, 3).whileTrue(new ReverseIntake(intakeSubsystem, true));
-
-        //AMPHI PID
         new JoystickButton(joystick2, 4).whileTrue(
                 AutoArm.getInstance()
         );
 
-        //Fire Command
-        //new JoystickButton(joystick2, 2).onTrue(new FireCommand());
+        new JoystickButton(joystick1, 10).whileTrue(
+                new ArmLockCommand(armlocksubsystem, true
+                ));
 
-        new JoystickButton(joystick2, 2).onTrue(new SequentialCommandGroup(
-                new AutoArm(ArmSubsystem.getInstance(), limelightSubsystem, PositionControl.auto),
-                new ShooterSenderCommand(intakeSubsystem, mz80, true)));
-
-        //Kanca kilit
-        new JoystickButton(joystick1, 10).whileTrue(new ArmLockCommand(armlocksubsystem, true));
-
-        //Kanca kilit Reverse
         new JoystickButton(joystick2, 9).whileTrue(new ReverseArmLock(armlocksubsystem, true));
 
         new JoystickButton(joystick1, 9).//7
@@ -132,7 +128,6 @@ public class RobotContainer {
                         PoseEstimation.getInstance().getEstimatedPose().getTranslation(),
                         new Rotation2d()))));
 
-        // Driving
         new JoystickButton(joystick1, 8).
                 whileTrue(new RunCommand(
                         drivetrain::setX,
@@ -142,11 +137,11 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return new ParallelCommandGroup(
-                new ShooterCommand(),
+                ShooterCommand.getInstance(),
                 new SequentialCommandGroup(
                         new SlowArmDown(ArmSubsystem.getInstance(), PositionController.ShouldBe),
                         new WaitCommand(0.3),
-                        new ShooterSenderCommand(intakeSubsystem, mz80, true),
+                        new ShooterSenderCommand(IntakeSubsystem.getInstance(), MZ80.getInstance(), true),
                         new SlowArmDown(ArmSubsystem.getInstance(), PositionController.Zero)
                 )
         );
@@ -165,16 +160,6 @@ public class RobotContainer {
     public static ArmSubsystem getArmSubsystem() {
         return ArmSubsystem.getInstance();
     }
-
-    public static IntakeSubsystem getIntakeSubsystem() {
-        return intakeSubsystem;
-    }
-
-
-    public static MZ80 getMZ80() {
-        return mz80;
-    }
-
 }
 
 

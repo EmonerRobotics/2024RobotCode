@@ -6,9 +6,20 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.ArmLockCommand;
 
 public class ArmLockSubsystem extends SubsystemBase {
+  private static ArmLockSubsystem instance = null;
+
   private PWMVictorSPX armLockMotor;
+
+  public static ArmLockSubsystem getInstance() {
+    if (instance == null) {
+      instance = new ArmLockSubsystem();
+    }
+    return instance;
+  }
+
   /** Creates a new ArmLockSubsystem. */
   public ArmLockSubsystem() {
     armLockMotor = new PWMVictorSPX(0);

@@ -10,11 +10,24 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MZ80;
 
 public class ShooterSenderCommand extends Command {
-  
+
+  private static ShooterSenderCommand instance = null;
+
   private final MZ80 mz80;
   private final IntakeSubsystem intakeSubsystem;
   private boolean start;
   
+
+    public static ShooterSenderCommand getInstance() {
+        if (instance == null) {
+        instance = new ShooterSenderCommand(
+                IntakeSubsystem.getInstance(),
+                MZ80.getInstance(),
+                true
+        );
+        }
+        return instance;
+    }
 
   /** Creates a new IntakeCommand. */
   public ShooterSenderCommand(IntakeSubsystem intakeSubsystem, MZ80 mz80, boolean start) {

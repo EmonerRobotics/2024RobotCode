@@ -19,6 +19,8 @@ import frc.robot.commands.ShooterSenderCommand;
 import frc.robot.commands.SlowArmDown;
 import frc.robot.commands.AutoArm.PositionControl;
 import frc.robot.commands.SlowArmDown.PositionController;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.MZ80;
 
 
 public class FRCPathPlanner {
@@ -36,11 +38,11 @@ public class FRCPathPlanner {
     }
 
     public static void CommandNameEntry() {
-        NamedCommands.registerCommand("intake", new IntakeCommand(RobotContainer.getIntakeSubsystem(), RobotContainer.getMZ80(), true));
+        NamedCommands.registerCommand("intake", new IntakeCommand(IntakeSubsystem.getInstance(), MZ80.getInstance(), true));
         NamedCommands.registerCommand("fire", new FireCommand());
-        NamedCommands.registerCommand("shooter", new ShooterCommand());
+        NamedCommands.registerCommand("shooter", ShooterCommand.getInstance());
         NamedCommands.registerCommand("slowArm", new SlowArmDown(RobotContainer.getArmSubsystem(), PositionController.ShouldBe));
-        NamedCommands.registerCommand("sender", new ShooterSenderCommand(RobotContainer.getIntakeSubsystem(), RobotContainer.getMZ80(), true));
+        NamedCommands.registerCommand("sender", ShooterSenderCommand.getInstance());
         NamedCommands.registerCommand("autoArm", new AutoArm(RobotContainer.getArmSubsystem(), RobotContainer.getLimelightSubsystem(), PositionControl.auto));
         NamedCommands.registerCommand("zeroArm", new SlowArmDown(RobotContainer.getArmSubsystem(), PositionController.Zero));
     }

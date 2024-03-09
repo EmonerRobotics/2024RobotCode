@@ -11,27 +11,31 @@ import frc.robot.commands.AutoArm.PositionControl;
 import frc.robot.commands.CenterToTarget.CenterChecker;
 import frc.robot.commands.SlowArmDown.PositionController;
 import frc.robot.poseestimation.PoseEstimation;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.MZ80;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class FireCommand extends SequentialCommandGroup {
 
-  /** Creates a new FireCommand. */
-  public FireCommand() {
+    /**
+     * Creates a new FireCommand.
+     */
+    public FireCommand() {
+        addCommands(
+                new ParallelCommandGroup(
+                        new CenterToTarget(RobotContainer.getSwerveSubsystem(), PoseEstimation.getInstance(),
+                                RobotContainer.getLimelightSubsystem(), CenterChecker.CENTER),
 
-    // Add your commands in the addCommands() call, e.g.
-    // addCommands(new FooCommand(), new BarCommand());
-    addCommands(
-      new ParallelCommandGroup(
-          new CenterToTarget(RobotContainer.getSwerveSubsystem(), PoseEstimation.getInstance(),
-          RobotContainer.getLimelightSubsystem(), CenterChecker.CENTER),
+                        new AutoArm(RobotContainer.getArmSubsystem(), RobotContainer.getLimelightSubsystem(), PositionControl.ShouldBe)
+                ),
+                ShooterSenderCommand.getInstance(),
+                new SlowArmDown(
+                        RobotContainer.getArmSubsystem(),
+                        PositionController.Zero
+                )
+        );
 
-          new AutoArm(RobotContainer.getArmSubsystem(), RobotContainer.getLimelightSubsystem(), PositionControl.ShouldBe)
-         ),
-          new ShooterSenderCommand(RobotContainer.getIntakeSubsystem(), RobotContainer.getMZ80(),true),
-          new SlowArmDown(RobotContainer.getArmSubsystem(), PositionController.Zero)
-          );
-          
-  }
+    }
 }
