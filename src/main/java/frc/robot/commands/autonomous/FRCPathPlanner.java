@@ -38,12 +38,13 @@ public class FRCPathPlanner {
     }
 
     public static void CommandNameEntry() {
-        NamedCommands.registerCommand("intake", new IntakeCommand(IntakeSubsystem.getInstance(), MZ80.getInstance(), true));
-        NamedCommands.registerCommand("fire", new FireCommand());
+        NamedCommands.registerCommand("intake", IntakeCommand.getInstance());
+        //NamedCommands.registerCommand("fire", new FireCommand());
         NamedCommands.registerCommand("shooter", ShooterCommand.getInstance());
         NamedCommands.registerCommand("slowArm", new SlowArmDown(RobotContainer.getArmSubsystem(), PositionController.ShouldBe));
         NamedCommands.registerCommand("sender", ShooterSenderCommand.getInstance());
-        NamedCommands.registerCommand("autoArm", new AutoArm(RobotContainer.getArmSubsystem(), RobotContainer.getLimelightSubsystem(), PositionControl.auto));
+        NamedCommands.registerCommand("autoArm", AutoArm.getInstance());
+        AutoArm.getInstance().setPositionControl(PositionControl.auto);
         NamedCommands.registerCommand("zeroArm", new SlowArmDown(RobotContainer.getArmSubsystem(), PositionController.Zero));
     }
 

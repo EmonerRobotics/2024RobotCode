@@ -23,9 +23,11 @@ public class AutoArm extends Command {
     private final ArmSubsystem armSubsystem;
     private final LimelightSubsystem limelightSubsystem;
     private final PIDController pidController;
-    private final PositionControl positionControl;
+    private PositionControl positionControl;
 
-    public static AutoArm getInstance() {
+    public static AutoArm getInstance(
+
+    ) {
         if (instance == null) {
             instance = new AutoArm(
                     ArmSubsystem.getInstance(),
@@ -34,6 +36,10 @@ public class AutoArm extends Command {
             );
         }
         return instance;
+    }
+
+    public void setPositionControl(PositionControl positionControl) {
+        this.positionControl = positionControl;
     }
 
     /**

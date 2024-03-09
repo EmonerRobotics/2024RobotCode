@@ -109,6 +109,7 @@ public class RobotContainer {
         new JoystickButton(joystick2, 4).whileTrue(
                 AutoArm.getInstance()
         );
+        AutoArm.getInstance().setPositionControl(PositionControl.Amphi);
 
         new JoystickButton(joystick1, 10).whileTrue(
                 ArmLockCommand.getInstance());
