@@ -6,6 +6,7 @@ package frc.robot.commands.shooter;
 
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.arm.ArmCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.MZ80;
 
@@ -26,6 +27,12 @@ public class ShooterSenderCommand extends Command {
         }
         return instance;
     }
+
+    public static ShooterSenderCommand forceNewInstance() {
+        instance = new ShooterSenderCommand();
+        return instance;
+    }
+
 
     // Called when the command is initially scheduled.
     @Override

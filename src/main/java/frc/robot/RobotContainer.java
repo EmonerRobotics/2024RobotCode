@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
+import frc.robot.commands.autonomous.PathPlanner;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.arm.ArmCommand;
@@ -34,7 +35,7 @@ public class RobotContainer {
     public static final Joystick upSystemJoystick = new Joystick(Constants.JoystickConstants.UpSystem);
 
     public RobotContainer() {
-      //  PathPlanner.setPathPlannerSettings();
+        PathPlanner.setPathPlannerSettings();
         setupDefaults();
         configureUpSystemJoystickBindings();
         configureSwerveJoystickBindings();
@@ -45,13 +46,13 @@ public class RobotContainer {
                 upSystemJoystick,
                 1
         ).whileTrue(
-                ShooterSenderCommand.getInstance()
+                ShooterSenderCommand.forceNewInstance()
         );
 
         new JoystickButton(
                 upSystemJoystick,
                 2
-        ).onTrue(
+        ).toggleOnTrue(
                 new FireCommand().fireCommand()
         );
 

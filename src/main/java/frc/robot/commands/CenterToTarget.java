@@ -19,7 +19,6 @@ public class CenterToTarget extends Command {
     private final PIDController pidController;
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final PoseEstimation poseEstimation = PoseEstimation.getInstance();
-    private Rotation2d fieldOrientationZeroOffset = new Rotation2d();
     private double speedY;
 
 
@@ -40,14 +39,15 @@ public class CenterToTarget extends Command {
         if (limelightSubsystem.getTargetId() == 3 || limelightSubsystem.getTargetId() == 7) {
             if (limelightSubsystem.isTargetDetected()) {
                 pidController.setSetpoint(0);
+
                 speedY = pidController.calculate(limelightSubsystem.getHorizontalTargetOffsetAngle());
                 ChassisSpeeds fieldRelSpeeds = new ChassisSpeeds(0, 0, speedY);
                 System.out.println("CENTER SPEEDY:" + speedY);
                 ChassisSpeeds robotRelSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                         fieldRelSpeeds,
                         poseEstimation.getEstimatedPose().getRotation()
-                                .minus(AllianceUtils.getFieldOrientationZero().plus(fieldOrientationZeroOffset))
                 );
+
                 drivetrain.drive(robotRelSpeeds);
             } else {
                 System.out.println("NO TARGET");
@@ -61,7 +61,10 @@ public class CenterToTarget extends Command {
     @Override
     public void end(boolean interrupted) {
         ChassisSpeeds fieldRelSpeeds = new ChassisSpeeds(0, 0, 0);
-        ChassisSpeeds robotRelSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelSpeeds, poseEstimation.getEstimatedPose().getRotation().minus(AllianceUtils.getFieldOrientationZero().plus(fieldOrientationZeroOffset)));
+        ChassisSpeeds robotRelSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                fieldRelSpeeds,
+                poseEstimation.getEstimatedPose().getRotation()
+        );
         drivetrain.drive(robotRelSpeeds);
 
     }
@@ -70,8 +73,7 @@ public class CenterToTarget extends Command {
     @Override
     public boolean isFinished() {
         if (Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < 2) {
-            System.out.println("CENTER END");
-            speedY = 0;
+            System.out.println("CENTER end");
             return true;
         } else {
             return false;

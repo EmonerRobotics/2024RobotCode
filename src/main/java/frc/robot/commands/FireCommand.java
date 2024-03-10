@@ -12,10 +12,10 @@ public class FireCommand {
         return new SequentialCommandGroup(
                 new ParallelCommandGroup(
                         new CenterToTarget(),
-                        ArmCommand.getInstance(PositionType.TARGET)
+                        ArmCommand.forceNewInstance(PositionType.TARGET)
                 ),
-                ShooterSenderCommand.getInstance(),
-                ArmCommand.forceNewInstance(PositionType.GROUND)
+                ShooterSenderCommand.forceNewInstance()
+                //ArmCommand.forceNewInstance(PositionType.GROUND)
         );
 
     }
