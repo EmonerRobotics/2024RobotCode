@@ -14,20 +14,17 @@ public class IntakeSubsystem extends SubsystemBase {
     public static PWMVictorSPX intakeMotor;
     public static PWMVictorSPX intake1Motor;
 
+    public IntakeSubsystem() {
+        intakeMotor = new PWMVictorSPX(Constants.UpSystemConstants.intakeMotorPWM);
+        intake1Motor = new PWMVictorSPX(Constants.UpSystemConstants.intake1MotorPWM);
+        //intakeMotor.setInverted(true);
+    }
+
     public static IntakeSubsystem getInstance() {
         if (instance == null) {
             instance = new IntakeSubsystem();
         }
         return instance;
-    }
-
-    /**
-     * Creates a new IntakeSubsystem.
-     */
-    public IntakeSubsystem() {
-        intakeMotor = new PWMVictorSPX(Constants.UpSystemConstants.intakeMotorPWM);
-        intake1Motor = new PWMVictorSPX(Constants.UpSystemConstants.intake1MotorPWM);
-        //intakeMotor.setInverted(true);
     }
 
     public final void setMotor(boolean start) {
@@ -38,13 +35,6 @@ public class IntakeSubsystem extends SubsystemBase {
             intakeMotor.stopMotor();
             intake1Motor.stopMotor();
         }
-    
-    /* 
-    if(start){
-      intakeMotor.set(Constants.UpSystemConstants.setIntakeMotorSpeed);
-    }else{
-      intakeMotor.stopMotor();
-    }*/
     }
 
     public final void setReverseMotor(boolean reverse) {

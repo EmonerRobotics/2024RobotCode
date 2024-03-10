@@ -15,84 +15,83 @@ import frc.robot.utils.AllianceUtils;
 
 public class CenterToTarget extends Command {
 
-  private final LimelightSubsystem limelightSubsystem;
-  private final PIDController pidController;
-  private final Drivetrain drivetrain;
-  private final PoseEstimation poseEstimation;
-  private Rotation2d fieldOrientationZeroOffset = new Rotation2d();
-  private final CenterChecker centerChecker;
-  private double speedY;
+    private final LimelightSubsystem limelightSubsystem = LimelightSubsystem.getInstance();
+    private final PIDController pidController;
+    private final Drivetrain drivetrain = Drivetrain.getInstance();
+    private final PoseEstimation poseEstimation = PoseEstimation.getInstance();
+    private double speedY;
 
-  public static enum CenterChecker{
-    CENTER
-  }
- 
-  /** Creates a new CenterToTarget. */
-  public CenterToTarget(Drivetrain drivetrain, PoseEstimation poseEstimation, LimelightSubsystem limelightSubsystem, CenterChecker centerChecker) {
-    this.drivetrain = drivetrain;
-    this.poseEstimation = poseEstimation;
-    this.limelightSubsystem = limelightSubsystem;
-    this.centerChecker = centerChecker;
-    this.pidController = new PIDController(0.03, 0.02, 0);
-    addRequirements(limelightSubsystem);
-  }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    System.out.println("CENTER BASLADI");
-  }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    if(limelightSubsystem.getId() == 4 || limelightSubsystem.getId() == 7){ // 5 -> 4
-
-      if(limelightSubsystem.hasTargets() && centerChecker== CenterChecker.CENTER){
-      //  if(Math.abs(limelightSubsystem.getAim()) > -18){
-       //   if(limelightSubsystem.getAim() < -18){
-            pidController.setSetpoint(0);
-            speedY = pidController.calculate(limelightSubsystem.getAim());
-            ChassisSpeeds fieldRelSpeeds = new ChassisSpeeds(0, 0, speedY);
-            System.out.println("CENTER SPEEDY:" + speedY);
-            ChassisSpeeds robotRelSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelSpeeds, poseEstimation.getEstimatedPose().getRotation().minus(AllianceUtils.getFieldOrientationZero().plus(fieldOrientationZeroOffset)));
-            drivetrain.drive(robotRelSpeeds);
-      }else{
-        System.out.println("NO TARGET");
+    public CenterToTarget() {
+        this.pidController = new PIDController(0.04, 0.02, 0);
+        addRequirements(limelightSubsystem);
     }
-  }else{
-    System.out.println("NO TARGET");
-  }
-}
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    ChassisSpeeds fieldRelSpeeds = new ChassisSpeeds(0, 0, 0);
-    ChassisSpeeds robotRelSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelSpeeds, poseEstimation.getEstimatedPose().getRotation().minus(AllianceUtils.getFieldOrientationZero().plus(fieldOrientationZeroOffset)));
-    drivetrain.drive(robotRelSpeeds);
-    
-  }
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    if(Math.abs(limelightSubsystem.getAim()) < 2){
-
-      System.out.println("CENTER END");
-      speedY = 0; 
-      return true;
-    }else{
-      return false;
-      
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+        System.out.println("CENTER BASLADI");
     }
-    /* 
-    if(centerChecker == centerChecker.CENTER){
 
-    return (Math.abs(limelightSubsystem.getAim()) <= 0.01);
-    }else{
-      return false;
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        System.out.println("CenterToTarget: executing");
+
+        if (limelightSubsystem.getTargetId() == 3 || limelightSubsystem.getTargetId() == 7) {
+            System.out.println("CenterToTarget: target id 3 or 7");
+            if (limelightSubsystem.isTargetDetected()) {
+                System.out.println("CenterToTarget: target detected");
+
+                pidController.setSetpoint(0);
+
+                speedY = pidController.calculate(limelightSubsystem.getHorizontalTargetOffsetAngle());
+                System.out.println("CENTER SPEED-Y:" + speedY);
+
+                ChassisSpeeds fieldRelSpeeds = new ChassisSpeeds(0, 0, speedY);
+                ChassisSpeeds robotRelSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                        fieldRelSpeeds,
+                        poseEstimation.getEstimatedPose().getRotation()
+                );
+
+                drivetrain.drive(robotRelSpeeds);
+            } else {
+                System.out.println("NO TARGET");
+            }
+        } else {
+            System.out.println("NO TARGET");
+        }
     }
-    */
-  }
+
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        ChassisSpeeds fieldRelSpeeds = new ChassisSpeeds(0, 0, 0);
+        ChassisSpeeds robotRelSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                fieldRelSpeeds,
+                poseEstimation.getEstimatedPose().getRotation()
+        );
+        drivetrain.drive(robotRelSpeeds);
+
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+
+        System.out.println("tx" + Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()));
+        System.out.println("tx bool" + String.valueOf(Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < 2));
+
+        if(!limelightSubsystem.isTargetDetected()) {
+            return false;
+        }
+
+        if (Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < 1) {
+            System.out.println("CENTER end");
+            return true;
+        } else {
+            return false;
+
+        }
+    }
 }

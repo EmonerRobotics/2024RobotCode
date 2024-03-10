@@ -15,11 +15,26 @@ import frc.robot.Constants;
 
 public class ArmSubsystem extends SubsystemBase {
 
-    private CANSparkMax armLmotor;
-    private CANSparkMax armRmotor;
-    private DutyCycleEncoder m_angleEncoder;
+    private final CANSparkMax armLmotor = new CANSparkMax(
+            Constants.UpSystemConstants.armLmotorId,
+            MotorType.kBrushless
+    );
+
+    private final CANSparkMax armRmotor = new CANSparkMax(
+            Constants.UpSystemConstants.armRmotorId,
+            MotorType.kBrushless
+    );
+
+    private final DutyCycleEncoder angleEncoder = new DutyCycleEncoder(0);
 
     private static ArmSubsystem instance = null;
+
+    public ArmSubsystem() {
+        armRmotor.setInverted(true);
+
+        setIdleModesOfArmMotorsAsImmediateBrake();
+        resetEncoderDistanceToZero();
+    }
 
     public static ArmSubsystem getInstance() {
         if (instance == null) {
@@ -28,34 +43,27 @@ public class ArmSubsystem extends SubsystemBase {
         return instance;
     }
 
-    /**
-     * Creates a new ArmSubsystem.
-     */
-    public ArmSubsystem() {
-        armLmotor = new CANSparkMax(Constants.UpSystemConstants.armLmotorId, MotorType.kBrushless);
-        armRmotor = new CANSparkMax(Constants.UpSystemConstants.armRmotorId, MotorType.kBrushless);
-
-        armRmotor.setInverted(true);
-
-        armLmotor.setIdleMode(IdleMode.kBrake);
-        armRmotor.setIdleMode(IdleMode.kBrake);
-
-        //m_angleEncoder = armLmotor.get
-        m_angleEncoder = new DutyCycleEncoder(0);
-        m_angleEncoder.reset();
-    }
-
     public void manuelArmControl(double controller) {
         armLmotor.set(controller * .5);
         armRmotor.set(controller * .5);
     }
 
     public double getEncoderDegrees() {
-        return ((m_angleEncoder.getAbsolutePosition() * 360) - 39);
+        return ((angleEncoder.getAbsolutePosition() * 360) - 39);
+    }
+
+    private void setIdleModesOfArmMotorsAsImmediateBrake() {
+        armLmotor.setIdleMode(IdleMode.kBrake);
+        armRmotor.setIdleMode(IdleMode.kBrake);
+    }
+
+    private void resetEncoderDistanceToZero() {
+        angleEncoder.reset();
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Arm Degrees: ", getEncoderDegrees());
     }
+
 }

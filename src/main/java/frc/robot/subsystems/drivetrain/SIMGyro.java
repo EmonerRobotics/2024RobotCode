@@ -50,8 +50,8 @@ public class SIMGyro implements Gyro {
         Translation2d referenceModuleVelocity = new Translation2d(referenceModule.speedMetersPerSecond, referenceModule.angle);
         Translation2d referenceRotationalVelocityComponent = referenceModuleVelocity.minus(velocity);
 
-  
-        double turningDirection = referenceRotationalVelocityComponent.getAngle().getRadians() > referenceModulePosition.getAngle().getRadians()  ? 1 : -1;
+
+        double turningDirection = referenceRotationalVelocityComponent.getAngle().getRadians() > referenceModulePosition.getAngle().getRadians() ? 1 : -1;
 
         turningRate = Rotation2d.fromRadians(referenceRotationalVelocityComponent.getNorm() * turningDirection / referenceModulePosition.getNorm());
         rotation = rotation.plus(turningRate.times(Robot.kDefaultPeriod));
