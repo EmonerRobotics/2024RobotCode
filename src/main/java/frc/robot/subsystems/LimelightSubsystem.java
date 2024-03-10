@@ -26,7 +26,7 @@ public class LimelightSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        EstimatedDistance();
+        estimateDistance();
         SmartDashboard.putBoolean("Found Target", hasTargets());
         SmartDashboard.putNumber("ARM Should", findShooterDegrees());
     }
@@ -43,7 +43,7 @@ public class LimelightSubsystem extends SubsystemBase {
         return headingError;
     }
 
-    public double EstimatedDistance() {
+    public double estimateDistance() {
         getTy();
 
         // how many degrees back is your limelight rotated from perfectly vertical?

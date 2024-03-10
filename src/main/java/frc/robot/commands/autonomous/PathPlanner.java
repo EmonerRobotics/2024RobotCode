@@ -10,9 +10,11 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.*;
-import frc.robot.commands.AutoArm.PositionControl;
-import frc.robot.commands.SlowArmDown.PositionController;
+import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.arm.ArmCommand;
+import frc.robot.commands.shooter.ShooterCommand;
+import frc.robot.commands.shooter.ShooterSenderCommand;
+import frc.robot.enums.PositionType;
 
 
 public class PathPlanner {
@@ -33,12 +35,10 @@ public class PathPlanner {
         NamedCommands.registerCommand("intake", IntakeCommand.getInstance());
         //NamedCommands.registerCommand("fire", new FireCommand());
         NamedCommands.registerCommand("shooter", ShooterCommand.getInstance());
-        NamedCommands.registerCommand("slowArm", new SlowArmDown(PositionController.ShouldBe)
-        );
+        NamedCommands.registerCommand("slowArm", ArmCommand.getInstance(PositionType.TARGET));
         NamedCommands.registerCommand("sender", ShooterSenderCommand.getInstance());
-        NamedCommands.registerCommand("autoArm", AutoArm.getInstance(PositionControl.auto));
-        NamedCommands.registerCommand("zeroArm", new SlowArmDown(PositionController.Zero)
-        );
+        NamedCommands.registerCommand("autoArm", ArmCommand.getInstance(PositionType.AUTO));
+        NamedCommands.registerCommand("zeroArm", ArmCommand.getInstance(PositionType.GROUND));
     }
 
 }

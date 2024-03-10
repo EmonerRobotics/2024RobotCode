@@ -2,54 +2,49 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
-
+package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.MZ80;
 
-public class IntakeCommand extends Command {
-    private static IntakeCommand instance = null;
+public class ReverseIntake extends Command {
 
-    private final MZ80 mz80 = MZ80.getInstance();
+    private static ReverseIntake instance = null;
+
+    //TODO: if same reference is used, it will be better or not
     private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
-    private boolean isCommandEnd = false;
 
-    public IntakeCommand() {
+    public ReverseIntake() {
         addRequirements(intakeSubsystem);
     }
 
-    public static IntakeCommand getInstance() {
+    public static ReverseIntake getInstance() {
         if (instance == null) {
-            instance = new IntakeCommand();
+            instance = new ReverseIntake();
         }
         return instance;
     }
 
+    // Called when the command is initially scheduled.
     @Override
     public void initialize() {
     }
 
+    // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        boolean isSensorDistanceReached = mz80.isSenorDistanceReached();
-
-        //TODO: FİX realsense sensor with naming
-        intakeSubsystem.setMotor(!isSensorDistanceReached);
-        isCommandEnd = isSensorDistanceReached;
+        intakeSubsystem.setReverseMotor(true);
     }
 
+    // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         intakeSubsystem.setMotor(false);
     }
 
+    // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        System.out.println("-----ultrasonic sensor");
-        System.out.println(String.valueOf(mz80.isSenorDistanceReached()));
-        return isCommandEnd;
+        return false;
     }
-
 }

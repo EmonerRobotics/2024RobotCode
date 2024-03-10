@@ -15,23 +15,25 @@ import frc.robot.Constants;
 
 public class ArmSubsystem extends SubsystemBase {
 
-    private final CANSparkMax armLmotor;
-    private final CANSparkMax armRmotor;
-    private final DutyCycleEncoder angleEncoder;
+    private final CANSparkMax armLmotor = new CANSparkMax(
+            Constants.UpSystemConstants.armLmotorId,
+            MotorType.kBrushless
+    );
+
+    private final CANSparkMax armRmotor = new CANSparkMax(
+            Constants.UpSystemConstants.armRmotorId,
+            MotorType.kBrushless
+    );
+
+    private final DutyCycleEncoder angleEncoder = new DutyCycleEncoder(0);
 
     private static ArmSubsystem instance = null;
 
     public ArmSubsystem() {
-        armLmotor = new CANSparkMax(Constants.UpSystemConstants.armLmotorId, MotorType.kBrushless);
-        armRmotor = new CANSparkMax(Constants.UpSystemConstants.armRmotorId, MotorType.kBrushless);
-
         armRmotor.setInverted(true);
 
-        armLmotor.setIdleMode(IdleMode.kBrake);
-        armRmotor.setIdleMode(IdleMode.kBrake);
-
-        angleEncoder = new DutyCycleEncoder(0);
-        angleEncoder.reset();
+        setIdleModesOfArmMotorsAsImmediateBrake();
+        resetEncoderDistanceToZero();
     }
 
     public static ArmSubsystem getInstance() {
@@ -50,8 +52,18 @@ public class ArmSubsystem extends SubsystemBase {
         return ((angleEncoder.getAbsolutePosition() * 360) - 39);
     }
 
+    private void setIdleModesOfArmMotorsAsImmediateBrake() {
+        armLmotor.setIdleMode(IdleMode.kBrake);
+        armRmotor.setIdleMode(IdleMode.kBrake);
+    }
+
+    private void resetEncoderDistanceToZero() {
+        angleEncoder.reset();
+    }
+
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Arm Degrees: ", getEncoderDegrees());
     }
+
 }

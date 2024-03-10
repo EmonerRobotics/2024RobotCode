@@ -2,24 +2,27 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.shooter;
+
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.ArmLockSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.MZ80;
 
-public class ReverseArmLock extends Command {
+public class ShooterSenderCommand extends Command {
 
-    private static ReverseArmLock instance = null;
+    private static ShooterSenderCommand instance = null;
 
-    public ArmLockSubsystem armLockSubsystem = ArmLockSubsystem.getInstance();
+    private final MZ80 mz80 = MZ80.getInstance();
+    private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
 
-    public ReverseArmLock() {
-        addRequirements(armLockSubsystem);
+    public ShooterSenderCommand() {
+        addRequirements(intakeSubsystem);
     }
 
-    public static ReverseArmLock getInstance() {
+    public static ShooterSenderCommand getInstance() {
         if (instance == null) {
-            instance = new ReverseArmLock();
+            instance = new ShooterSenderCommand();
         }
         return instance;
     }
@@ -32,18 +35,18 @@ public class ReverseArmLock extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        armLockSubsystem.setReverseMotor(true);
+        intakeSubsystem.setMotor(true);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        armLockSubsystem.setLockMotor(false);
+        intakeSubsystem.setMotor(false);
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return false;
+        return !mz80.isSenorDistanceReached();
     }
 }

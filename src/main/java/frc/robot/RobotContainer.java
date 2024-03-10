@@ -6,21 +6,23 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
-import frc.robot.commands.AutoArm.PositionControl;
-import frc.robot.commands.SlowArmDown.PositionController;
+import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.intake.ReverseIntake;
+import frc.robot.commands.arm.ArmCommand;
+import frc.robot.commands.arm.ArmLockCommand;
+import frc.robot.commands.arm.ManuelArmCommand;
+import frc.robot.commands.arm.ReverseArmLock;
 import frc.robot.commands.autonomous.PathPlanner;
+import frc.robot.commands.shooter.ShooterCommand;
+import frc.robot.commands.shooter.ShooterSenderCommand;
+import frc.robot.enums.PositionType;
 import frc.robot.poseestimation.PoseEstimation;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.utils.AllianceUtils;
-
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -65,7 +67,7 @@ public class RobotContainer {
                 upSystemJoystick,
                 4
         ).whileTrue(
-                AutoArm.getInstance(PositionControl.Amphi)
+                ArmCommand.getInstance(PositionType.AMPHI)
         );
 
         new JoystickButton(
@@ -128,10 +130,10 @@ public class RobotContainer {
         return new ParallelCommandGroup(
                 ShooterCommand.getInstance(),
                 new SequentialCommandGroup(
-                        new SlowArmDown(PositionController.ShouldBe),
+                        ArmCommand.getInstance(PositionType.TARGET),
                         new WaitCommand(0.3),
                         new ShooterSenderCommand(),
-                        new SlowArmDown(PositionController.Zero)
+                        ArmCommand.getInstance(PositionType.GROUND)
                 )
         );
 
@@ -141,7 +143,7 @@ public class RobotContainer {
         Drivetrain.getInstance().setDefaultCommand(DriveWithJoysticks.getInstance(swerveJoystick));
 
         ArmSubsystem.getInstance().setDefaultCommand(
-                new ArmCommand(() -> upSystemJoystick.getRawAxis(1))
+                new ManuelArmCommand(() -> upSystemJoystick.getRawAxis(1))
         );
     }
 
