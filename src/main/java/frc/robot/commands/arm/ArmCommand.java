@@ -67,7 +67,7 @@ public class ArmCommand extends Command {
         } else {
             pidController.setSetpoint(positionType.positionDegree);
         }
-        armSubsystem.manuelArmControl( -1 * positionType.speedMultiplier * armControlOutput);
+        armSubsystem.manuelArmControl(-1 * positionType.speedMultiplier * armControlOutput);
 
     }
 
@@ -88,20 +88,12 @@ public class ArmCommand extends Command {
 
         switch (positionType) {
             case TARGET:
-                System.out.println("ARM TARGET finished");
                 errorMargin = armSubsystem.getEncoderDegrees() - limelightSubsystem.findShooterDegrees();
                 SmartDashboard.putNumber("ARM SPEAKER ERROR: ", errorMargin);
                 break;
             case AMPHI:
-                System.out.println("ARM AMPHI finished");
                 SmartDashboard.putNumber("ARM AMPHI ERROR", errorMargin);
                 threshold = 1;
-                break;
-            case AUTO:
-                System.out.println("ARM AUTO finished");
-                break;
-            case GROUND:
-                System.out.println("ARM GROUND finished");
                 break;
 
         }

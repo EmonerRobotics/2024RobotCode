@@ -23,7 +23,7 @@ public class CenterToTarget extends Command {
 
 
     public CenterToTarget() {
-        this.pidController = new PIDController(0.03, 0.02, 0);
+        this.pidController = new PIDController(0.04, 0.02, 0);
         addRequirements(limelightSubsystem);
     }
 
@@ -36,13 +36,19 @@ public class CenterToTarget extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        System.out.println("CenterToTarget: executing");
+
         if (limelightSubsystem.getTargetId() == 3 || limelightSubsystem.getTargetId() == 7) {
+            System.out.println("CenterToTarget: target id 3 or 7");
             if (limelightSubsystem.isTargetDetected()) {
+                System.out.println("CenterToTarget: target detected");
+
                 pidController.setSetpoint(0);
 
                 speedY = pidController.calculate(limelightSubsystem.getHorizontalTargetOffsetAngle());
+                System.out.println("CENTER SPEED-Y:" + speedY);
+
                 ChassisSpeeds fieldRelSpeeds = new ChassisSpeeds(0, 0, speedY);
-                System.out.println("CENTER SPEEDY:" + speedY);
                 ChassisSpeeds robotRelSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                         fieldRelSpeeds,
                         poseEstimation.getEstimatedPose().getRotation()
@@ -72,7 +78,15 @@ public class CenterToTarget extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        if (Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < 2) {
+
+        System.out.println("tx" + Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()));
+        System.out.println("tx bool" + String.valueOf(Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < 2));
+
+        if(!limelightSubsystem.isTargetDetected()) {
+            return false;
+        }
+
+        if (Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < 1) {
             System.out.println("CENTER end");
             return true;
         } else {

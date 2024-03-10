@@ -52,7 +52,7 @@ public class RobotContainer {
         new JoystickButton(
                 upSystemJoystick,
                 2
-        ).toggleOnTrue(
+        ).onTrue(
                 new FireCommand().fireCommand()
         );
 
