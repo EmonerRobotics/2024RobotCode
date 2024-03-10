@@ -133,6 +133,8 @@ public final class Constants {
 
         public static final int DRIVING_MOTOR_CURRENT_LIMIT = 20; // amps
         public static final int TURNING_MOTOR_CURRENT_LIMIT = 15; // amps
+
+        public static final String LIMELIGHT_TABLE_NAME = "limelight";
     }
 
     public static final class NeoMotorConstants {
@@ -145,10 +147,7 @@ public final class Constants {
 
 
     public static class VisionConstants {
-
         public static final double ApriltagSpeakerHeight = 143.25;
-
-
     }
 
 }

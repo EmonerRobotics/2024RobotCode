@@ -16,7 +16,6 @@ import frc.robot.commands.arm.ArmCommand;
 import frc.robot.commands.arm.ArmLockCommand;
 import frc.robot.commands.arm.ManuelArmCommand;
 import frc.robot.commands.arm.ReverseArmLock;
-import frc.robot.commands.autonomous.PathPlanner;
 import frc.robot.commands.shooter.ShooterCommand;
 import frc.robot.commands.shooter.ShooterSenderCommand;
 import frc.robot.enums.PositionType;
@@ -35,7 +34,7 @@ public class RobotContainer {
     public static final Joystick upSystemJoystick = new Joystick(Constants.JoystickConstants.UpSystem);
 
     public RobotContainer() {
-        PathPlanner.setPathPlannerSettings();
+      //  PathPlanner.setPathPlannerSettings();
         setupDefaults();
         configureUpSystemJoystickBindings();
         configureSwerveJoystickBindings();
@@ -53,7 +52,7 @@ public class RobotContainer {
                 upSystemJoystick,
                 2
         ).onTrue(
-                new FireCommand()
+                new FireCommand().fireCommand()
         );
 
         new JoystickButton(
@@ -67,7 +66,7 @@ public class RobotContainer {
                 upSystemJoystick,
                 4
         ).whileTrue(
-                ArmCommand.getInstance(PositionType.AMPHI)
+               ArmCommand.forceNewInstance(PositionType.AMPHI)
         );
 
         new JoystickButton(

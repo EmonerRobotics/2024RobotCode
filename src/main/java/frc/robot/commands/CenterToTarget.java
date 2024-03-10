@@ -20,18 +20,10 @@ public class CenterToTarget extends Command {
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final PoseEstimation poseEstimation = PoseEstimation.getInstance();
     private Rotation2d fieldOrientationZeroOffset = new Rotation2d();
-    private final CenterChecker centerChecker;
     private double speedY;
 
-    public enum CenterChecker {
-        CENTER
-    }
 
-    /**
-     * Creates a new CenterToTarget.
-     */
-    public CenterToTarget(CenterChecker centerChecker) {
-        this.centerChecker = centerChecker;
+    public CenterToTarget() {
         this.pidController = new PIDController(0.03, 0.02, 0);
         addRequirements(limelightSubsystem);
     }
@@ -45,14 +37,17 @@ public class CenterToTarget extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (limelightSubsystem.getId() == 3 || limelightSubsystem.getId() == 7) { // 5 -> 4
-
-            if (limelightSubsystem.hasTargets() && centerChecker == CenterChecker.CENTER) {
+        if (limelightSubsystem.getTargetId() == 3 || limelightSubsystem.getTargetId() == 7) {
+            if (limelightSubsystem.isTargetDetected()) {
                 pidController.setSetpoint(0);
-                speedY = pidController.calculate(limelightSubsystem.getAim());
+                speedY = pidController.calculate(limelightSubsystem.getHorizontalTargetOffsetAngle());
                 ChassisSpeeds fieldRelSpeeds = new ChassisSpeeds(0, 0, speedY);
                 System.out.println("CENTER SPEEDY:" + speedY);
-                ChassisSpeeds robotRelSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(fieldRelSpeeds, poseEstimation.getEstimatedPose().getRotation().minus(AllianceUtils.getFieldOrientationZero().plus(fieldOrientationZeroOffset)));
+                ChassisSpeeds robotRelSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                        fieldRelSpeeds,
+                        poseEstimation.getEstimatedPose().getRotation()
+                                .minus(AllianceUtils.getFieldOrientationZero().plus(fieldOrientationZeroOffset))
+                );
                 drivetrain.drive(robotRelSpeeds);
             } else {
                 System.out.println("NO TARGET");
@@ -74,8 +69,7 @@ public class CenterToTarget extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        if (Math.abs(limelightSubsystem.getAim()) < 2) {
-
+        if (Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < 2) {
             System.out.println("CENTER END");
             speedY = 0;
             return true;

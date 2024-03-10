@@ -36,6 +36,12 @@ public class ArmCommand extends Command {
         return instance;
     }
 
+    public static ArmCommand forceNewInstance(PositionType positionType) {
+        instance = new ArmCommand();
+        instance.setPIDController(positionType);
+        return instance;
+    }
+
     private void setPIDController(PositionType positionType) {
         if (this.positionType != positionType) {
             if (Objects.requireNonNull(positionType) == PositionType.GROUND) {
@@ -61,7 +67,7 @@ public class ArmCommand extends Command {
         } else {
             pidController.setSetpoint(positionType.positionDegree);
         }
-        armSubsystem.manuelArmControl(-positionType.speedMultiplier * armControlOutput);
+        armSubsystem.manuelArmControl( -1 * positionType.speedMultiplier * armControlOutput);
 
     }
 

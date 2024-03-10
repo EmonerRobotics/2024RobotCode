@@ -11,11 +11,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
+import static frc.robot.Constants.ModuleConstants.LIMELIGHT_TABLE_NAME;
+import static frc.robot.enums.NetworkTableEntryTypes.*;
+
 public class LimelightSubsystem extends SubsystemBase {
-
-    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-
     private static LimelightSubsystem instance = null;
+
+    NetworkTable table = NetworkTableInstance.getDefault().getTable(LIMELIGHT_TABLE_NAME);
 
     public static LimelightSubsystem getInstance() {
         if (instance == null) {
@@ -26,25 +28,37 @@ public class LimelightSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        estimateDistance();
-        SmartDashboard.putBoolean("Found Target", hasTargets());
+        getEstimatedDistance();
+        SmartDashboard.putBoolean("Found Target", isTargetDetected());
         SmartDashboard.putNumber("ARM Should", findShooterDegrees());
     }
 
-    public double getTy() {
-        NetworkTableEntry ty = table.getEntry("ty");
-        double targetOffsetAngle_Vertical = ty.getDouble(0.0);
-        return targetOffsetAngle_Vertical;
+    public double getVerticalTargetOffsetAngle() {
+        NetworkTableEntry ty = table.getEntry(TARGET_Y_AXIS.entryCode);
+        return ty.getDouble(0.0);
     }
 
-    public double getAim() {
-        NetworkTableEntry tx = table.getEntry("tx");
-        double headingError = tx.getDouble(0.0);
-        return headingError;
+    public double getHorizontalTargetOffsetAngle() {
+        NetworkTableEntry tx = table.getEntry(TARGET_X_AXIS.entryCode);
+        return tx.getDouble(0.0);
     }
 
-    public double estimateDistance() {
-        getTy();
+    public double findShooterDegrees() {
+        return (0.0095 * Math.pow(getVerticalTargetOffsetAngle(), 2) - 1.0182 * getVerticalTargetOffsetAngle() + 24.5);
+    }
+
+    public double getTargetId() {
+        NetworkTableEntry targetId = table.getEntry(TARGET_ID.entryCode);
+        return targetId.getDouble(0.0);
+    }
+
+    public boolean isTargetDetected() {
+        NetworkTableEntry targetDetectionValue = table.getEntry(TARGET_DETECTION.entryCode);
+        return targetDetectionValue.getFloat(0) != 0.0f;
+    }
+
+    public double getEstimatedDistance() {
+        getVerticalTargetOffsetAngle();
 
         // how many degrees back is your limelight rotated from perfectly vertical?
         double limelightMountAngleDegrees = 30.5;
@@ -53,28 +67,12 @@ public class LimelightSubsystem extends SubsystemBase {
         double limelightLensHeightCentimeter = 49.5;
 
         // distance from the target to the floor
-        double angleToGoalDegrees = limelightMountAngleDegrees + (getTy() - 2);
+        double angleToGoalDegrees = limelightMountAngleDegrees + (getVerticalTargetOffsetAngle() - 2);
         double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
 
         //calculate distance
         double distanceFromLimelightToGoalCentimeter = ((Constants.VisionConstants.ApriltagSpeakerHeight - limelightLensHeightCentimeter) / Math.tan(angleToGoalRadians));
         SmartDashboard.putNumber("Distance", distanceFromLimelightToGoalCentimeter);
         return distanceFromLimelightToGoalCentimeter;
-    }
-
-    public double findShooterDegrees() {
-        return (0.0095 * Math.pow(getTy(), 2) - 1.0182 * getTy() + 24.5); //24.5
-    }
-
-    public double getId() {
-        NetworkTableEntry tid = table.getEntry("tid");
-        double tId = tid.getDouble(0.0);
-        return tId;
-    }
-
-    public boolean hasTargets() {
-        NetworkTableEntry tv = table.getEntry("tv");
-        float isTrue = tv.getFloat(0);
-        return (isTrue == 0.0f) ? false : true;
     }
 }
