@@ -1,6 +1,6 @@
 package frc.robot.enums;
 
-public enum NetworkTableEntryTypes {
+public enum NetworkTableEntryType {
     TARGET_X_AXIS("tx"),
     TARGET_Y_AXIS("ty"),
     TARGET_ID("tid"),
@@ -8,7 +8,7 @@ public enum NetworkTableEntryTypes {
 
     public final String entryCode;
 
-    private NetworkTableEntryTypes(String entryCode) {
+    private NetworkTableEntryType(String entryCode) {
         this.entryCode = entryCode;
     }
 }

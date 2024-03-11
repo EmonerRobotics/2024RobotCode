@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 import static frc.robot.Constants.ModuleConstants.LIMELIGHT_TABLE_NAME;
-import static frc.robot.enums.NetworkTableEntryTypes.*;
+import static frc.robot.enums.NetworkTableEntryType.*;
 
 public class LimelightSubsystem extends SubsystemBase {
     private static LimelightSubsystem instance = null;
