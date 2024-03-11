@@ -5,13 +5,11 @@
 package frc.robot.modules.internal.arm.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.core.utils.EnhancedCommand;
 import frc.robot.modules.internal.arm.ArmLockSubsystem;
 
-public class ArmLockCommand extends Command {
-
+public class ArmLockCommand extends EnhancedCommand {
     private static ArmLockCommand instance = null;
-
-    public ArmLockSubsystem armLockSubsystem = ArmLockSubsystem.getInstance();
 
     public ArmLockCommand() {
         addRequirements(armLockSubsystem);

@@ -29,8 +29,9 @@ public class LimelightSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         getEstimatedDistance();
-        SmartDashboard.putBoolean("Found Target", isTargetDetected());
-        SmartDashboard.putNumber("ARM Should", findShooterDegrees());
+        SmartDashboard.putBoolean("Is Target Detected", isTargetDetected());
+        SmartDashboard.putNumber("Target Shooter Degree", findShooterDegrees());
+        SmartDashboard.putNumber("Target ID", getTargetId());
     }
 
     public double getVerticalTargetOffsetAngle() {
@@ -72,7 +73,7 @@ public class LimelightSubsystem extends SubsystemBase {
 
         //calculate distance
         double distanceFromLimelightToGoalCentimeter = ((Constants.VisionConstants.ApriltagSpeakerHeight - limelightLensHeightCentimeter) / Math.tan(angleToGoalRadians));
-        SmartDashboard.putNumber("Distance", distanceFromLimelightToGoalCentimeter);
+        SmartDashboard.putNumber("Target Distance", distanceFromLimelightToGoalCentimeter);
         return distanceFromLimelightToGoalCentimeter;
     }
 }

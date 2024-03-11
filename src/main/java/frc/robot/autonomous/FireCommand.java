@@ -11,7 +11,7 @@ public class FireCommand {
     public Command fireCommand() {
         return new SequentialCommandGroup(
                 new ParallelCommandGroup(
-                        new CenterToTarget(),
+                        CenterToTarget.getInstance(),
                         ArmCommand.forceNewInstance(PositionType.TARGET)
                 ),
                 ShooterSenderCommand.forceNewInstance()

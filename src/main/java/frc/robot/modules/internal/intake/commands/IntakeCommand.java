@@ -6,15 +6,16 @@ package frc.robot.modules.internal.intake.commands;
 
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.core.utils.EnhancedCommand;
 import frc.robot.modules.external.ultrasonic.MZ80;
 import frc.robot.modules.internal.intake.IntakeSubsystem;
 import frc.robot.modules.internal.intake.IntakeType;
 
-public class IntakeCommand extends Command {
+import static frc.robot.core.utils.LoggingUtils.logMessage;
+
+public class IntakeCommand extends EnhancedCommand {
     private static IntakeCommand instance = null;
 
-    private final MZ80 mz80 = MZ80.getInstance();
-    private final IntakeSubsystem intakeSubsystem = IntakeSubsystem.getInstance();
     private boolean isCommandEnd = false;
     private IntakeType intakeType;
 
@@ -64,10 +65,10 @@ public class IntakeCommand extends Command {
     @Override
     public boolean isFinished() {
         if (intakeType == IntakeType.STANDARD) {
-            System.out.println("-----ultrasonic sensor");
-            System.out.println(String.valueOf(mz80.isSenorDistanceReached()));
+            logMessage("isSenorDistanceReached = " + mz80.isSenorDistanceReached());
             return isCommandEnd;
         }
+
         return false;
 
     }

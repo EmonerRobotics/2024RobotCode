@@ -8,16 +8,17 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.core.enums.PositionType;
+import frc.robot.core.utils.EnhancedCommand;
 import frc.robot.modules.external.limelight.LimelightSubsystem;
 import frc.robot.modules.internal.arm.ArmSubsystem;
 
 import java.util.Objects;
 
-public class ArmCommand extends Command {
+import static frc.robot.core.utils.LoggingUtils.logMessage;
+
+public class ArmCommand extends EnhancedCommand {
     private static ArmCommand instance = null;
 
-    private final ArmSubsystem armSubsystem = ArmSubsystem.getInstance();
-    private final LimelightSubsystem limelightSubsystem = LimelightSubsystem.getInstance();
     private final PIDController pidController;
     private PositionType positionType;
 
@@ -74,7 +75,7 @@ public class ArmCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         if (positionType == PositionType.GROUND) {
-            System.out.println("GROUND end");
+            logMessage(positionType.name() + " end");
         } else {
             armSubsystem.manuelArmControl(0);
         }
@@ -99,7 +100,7 @@ public class ArmCommand extends Command {
         }
 
         if (Math.abs(errorMargin) < threshold) {
-            System.out.println(positionType.name() + " finished");
+            logMessage(positionType.name() + " finished");
             return true;
         } else {
             return false;

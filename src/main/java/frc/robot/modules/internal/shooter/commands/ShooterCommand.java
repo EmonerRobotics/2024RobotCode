@@ -5,9 +5,10 @@
 package frc.robot.modules.internal.shooter.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.core.utils.EnhancedCommand;
 import frc.robot.modules.internal.shooter.ShooterSubsystem;
 
-public class ShooterCommand extends Command {
+public class ShooterCommand extends EnhancedCommand {
     private static ShooterCommand instance = null;
 
     private final ShooterSubsystem shooterSubsystem = ShooterSubsystem.getInstance();
@@ -34,7 +35,6 @@ public class ShooterCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        System.out.println("SHOOTER end");
         shooterSubsystem.setMotors(false);
     }
 

@@ -20,8 +20,8 @@ public class PathPlanner {
     public final static SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
 
     public static void setPathPlannerSettings() {
-        //  setDashboard();
-        //   commandNameEntry();
+        setDashboard();
+        commandNameEntry();
     }
 
     public static void setDashboard() {

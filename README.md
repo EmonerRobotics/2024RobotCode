@@ -18,11 +18,11 @@ Instance: CameraServer
 https://www.chiefdelphi.com/
 
 # Videos
-https://www.youtube.com/@0ToAuto
+https://www.youtube.com/@0ToAuto \
 https://www.youtube.com/watch?v=2n0JEsnK2QQ
 
 # Command extended class logics
-initialize() - Called when the command is initially scheduled.
-execute() - Called every time the scheduler runs while the command is scheduled.
-isFinished() - Returns true when the command should end. Default is false.
-end() - Called once the command ends or is interrupted.
+**initialize()** - Called when the command is initially scheduled.\
+**execute()** - Called every time the scheduler runs while the command is scheduled.\
+**isFinished()** - Returns true when the command should end. Default is false.\
+**end()** - Called once the command ends or is interrupted.

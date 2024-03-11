@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.autonomous.FireCommand;
-import frc.robot.autonomous.PathPlanner;
 import frc.robot.core.Constants;
 import frc.robot.core.Robot;
 import frc.robot.core.enums.PositionType;
@@ -37,7 +36,7 @@ public class RobotContainer {
     public static final Joystick upSystemJoystick = new Joystick(Constants.JoystickConstants.UpSystem);
 
     public RobotContainer() {
-        PathPlanner.setPathPlannerSettings();
+        //PathPlanner.setPathPlannerSettings();
         setupDefaults();
         configureUpSystemJoystickBindings();
         configureSwerveJoystickBindings();

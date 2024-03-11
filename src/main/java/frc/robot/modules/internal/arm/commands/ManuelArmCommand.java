@@ -5,13 +5,12 @@
 package frc.robot.modules.internal.arm.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.core.utils.EnhancedCommand;
 import frc.robot.modules.internal.arm.ArmSubsystem;
 
 import java.util.function.Supplier;
 
-public class ManuelArmCommand extends Command {
-
-    private final ArmSubsystem armSubsystem = ArmSubsystem.getInstance();
+public class ManuelArmCommand extends EnhancedCommand {
     private final Supplier<Double> controller;
 
     public ManuelArmCommand(Supplier<Double> controller) {
