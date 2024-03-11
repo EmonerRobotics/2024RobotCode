@@ -21,19 +21,18 @@ public class CenterToTarget extends Command {
     private final PoseEstimation poseEstimation = PoseEstimation.getInstance();
     private double speedY;
 
+    public static final int HORIZONTAL_MAX_ERROR_ANGLE = 1;
 
     public CenterToTarget() {
         this.pidController = new PIDController(0.04, 0.02, 0);
         addRequirements(limelightSubsystem);
     }
 
-    // Called when the command is initially scheduled.
     @Override
     public void initialize() {
         System.out.println("CENTER BASLADI");
     }
 
-    // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
         System.out.println("CenterToTarget: executing");
@@ -63,7 +62,6 @@ public class CenterToTarget extends Command {
         }
     }
 
-    // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         ChassisSpeeds fieldRelSpeeds = new ChassisSpeeds(0, 0, 0);
@@ -75,23 +73,16 @@ public class CenterToTarget extends Command {
 
     }
 
-    // Returns true when the command should end.
     @Override
     public boolean isFinished() {
+        boolean isTargetDetected = limelightSubsystem.isTargetDetected();
+        boolean isHorizontalTargetOffsetAngleErrorReached = Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < HORIZONTAL_MAX_ERROR_ANGLE;
 
-        System.out.println("tx" + Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()));
-        System.out.println("tx bool" + String.valueOf(Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < 2));
-
-        if(!limelightSubsystem.isTargetDetected()) {
-            return false;
-        }
-
-        if (Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < 1) {
+        if (isHorizontalTargetOffsetAngleErrorReached && isTargetDetected) {
             System.out.println("CENTER end");
             return true;
-        } else {
-            return false;
-
         }
+
+        return false;
     }
 }
