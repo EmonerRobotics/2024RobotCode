@@ -11,11 +11,8 @@ public class ShooterCommand extends Command {
     private static ShooterCommand instance = null;
 
     private final ShooterSubsystem shooterSubsystem = ShooterSubsystem.getInstance();
-    private final boolean start;
 
     public ShooterCommand() {
-        //TODO: start usage is suspecious
-        this.start = true;
         addRequirements(shooterSubsystem);
     }
 
@@ -32,22 +29,17 @@ public class ShooterCommand extends Command {
 
     @Override
     public void execute() {
-        shooterSubsystem.setMotors(start);
+        shooterSubsystem.setMotors(true);
     }
 
     @Override
     public void end(boolean interrupted) {
-
-        System.out.println("SHOOTER END");
-        shooterSubsystem.setMotors(!start);
+        System.out.println("SHOOTER end");
+        shooterSubsystem.setMotors(false);
     }
 
     @Override
     public boolean isFinished() {
-        if (!start) {
-            return true;
-        } else {
-            return false;
-        }
+        return false;
     }
 }
