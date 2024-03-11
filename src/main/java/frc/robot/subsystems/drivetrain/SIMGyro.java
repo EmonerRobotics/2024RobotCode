@@ -11,13 +11,12 @@ import java.util.Arrays;
 
 public class SIMGyro implements Gyro {
     private final SwerveModules swerveModules;
+    Rotation2d rotation = new Rotation2d();
+    Rotation2d turningRate = new Rotation2d();
 
     public SIMGyro(SwerveModules swerveModules) {
         this.swerveModules = swerveModules;
     }
-
-    Rotation2d rotation = new Rotation2d();
-    Rotation2d turningRate = new Rotation2d();
 
     @Override
     public boolean isConnected() {

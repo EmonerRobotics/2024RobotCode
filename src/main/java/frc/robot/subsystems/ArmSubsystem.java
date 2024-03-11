@@ -4,30 +4,26 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-
+import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ArmSubsystem extends SubsystemBase {
+    private static ArmSubsystem instance = null;
 
     private final CANSparkMax armLmotor = new CANSparkMax(
             Constants.UpSystemConstants.armLmotorId,
             MotorType.kBrushless
     );
-
     private final CANSparkMax armRmotor = new CANSparkMax(
             Constants.UpSystemConstants.armRmotorId,
             MotorType.kBrushless
     );
-
     private final DutyCycleEncoder angleEncoder = new DutyCycleEncoder(0);
-
-    private static ArmSubsystem instance = null;
 
     public ArmSubsystem() {
         armRmotor.setInverted(true);

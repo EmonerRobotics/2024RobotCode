@@ -1,14 +1,13 @@
 package frc.robot.subsystems.drivetrain;
- 
-import com.kauailabs.navx.frc.AHRS;
 
+import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.SPI;
 import frc.robot.Constants.DriveConstants;
 
-public class NavXGyro implements Gyro{
+public class NavXGyro implements Gyro {
     private final AHRS navX = new AHRS(SPI.Port.kMXP);
 
     public NavXGyro() {
@@ -29,10 +28,10 @@ public class NavXGyro implements Gyro{
     @Override
     public Rotation3d getRotation3d() {
         return DriveConstants.GYRO_ROTATION.rotateBy(new Rotation3d(new Quaternion(
-            navX.getQuaternionW(),
-            navX.getQuaternionX(),
-            navX.getQuaternionY(),
-            navX.getQuaternionZ()
+                navX.getQuaternionW(),
+                navX.getQuaternionX(),
+                navX.getQuaternionY(),
+                navX.getQuaternionZ()
         ))).rotateBy(DriveConstants.GYRO_ROTATION.unaryMinus());
     }
 

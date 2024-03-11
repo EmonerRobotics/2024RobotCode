@@ -14,14 +14,11 @@ import frc.robot.Robot;
 public class SIMSwerveModule implements SwerveModule {
 
     private final double chassisAngularOffset;
-
-    private FlywheelSim driveSim = new FlywheelSim(DCMotor.getNEO(1), 6.75, 0.025);
-    private FlywheelSim turnSim = new FlywheelSim(DCMotor.getNEO(1), Constants.ModuleConstants.TURNING_ENCODER_POSITION_FACTOR, 0.0001);
-
     private final PIDController drivePIDController;
     private final SimpleMotorFeedforward driveFeedForward;
     private final PIDController turnPIDController;
-
+    private FlywheelSim driveSim = new FlywheelSim(DCMotor.getNEO(1), 6.75, 0.025);
+    private FlywheelSim turnSim = new FlywheelSim(DCMotor.getNEO(1), Constants.ModuleConstants.TURNING_ENCODER_POSITION_FACTOR, 0.0001);
     private double drivePosition = 0.0;
     private double turnAbsolutePosition = 0.0;
 

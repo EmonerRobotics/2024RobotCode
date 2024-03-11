@@ -5,23 +5,20 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.poseestimation.PoseEstimation;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.drivetrain.Drivetrain;
-import frc.robot.utils.AllianceUtils;
 
 public class CenterToTarget extends Command {
 
+    public static final int HORIZONTAL_MAX_ERROR_ANGLE = 1;
     private final LimelightSubsystem limelightSubsystem = LimelightSubsystem.getInstance();
     private final PIDController pidController;
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final PoseEstimation poseEstimation = PoseEstimation.getInstance();
     private double speedY;
-
-    public static final int HORIZONTAL_MAX_ERROR_ANGLE = 1;
 
     public CenterToTarget() {
         this.pidController = new PIDController(0.04, 0.02, 0);

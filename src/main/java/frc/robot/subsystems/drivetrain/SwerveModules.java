@@ -66,6 +66,19 @@ public class SwerveModules {
         }
     }
 
+    public enum Corner {
+        FrontLeft(0),
+        FrontRight(1),
+        RearLeft(2),
+        RearRight(3);
+
+        public final int index;
+
+        Corner(int index) {
+            this.index = index;
+        }
+    }
+
     public static class States {
         public final SwerveModuleState frontLeft;
         public final SwerveModuleState frontRight;
@@ -120,19 +133,6 @@ public class SwerveModules {
 
         public SwerveModulePosition[] asArray() {
             return this.positions;
-        }
-    }
-
-    public enum Corner {
-        FrontLeft(0),
-        FrontRight(1),
-        RearLeft(2),
-        RearRight(3);
-
-        public final int index;
-
-        Corner(int index) {
-            this.index = index;
         }
     }
 }

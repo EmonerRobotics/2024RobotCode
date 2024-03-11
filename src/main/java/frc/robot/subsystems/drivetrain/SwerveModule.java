@@ -6,6 +6,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 public interface SwerveModule {
 
     SwerveModulePosition getPosition();
+
     void setDesiredState(SwerveModuleState desiredState);
 
     SwerveModuleState getState();

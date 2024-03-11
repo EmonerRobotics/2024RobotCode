@@ -9,14 +9,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.*;
-import frc.robot.commands.autonomous.PathPlanner;
-import frc.robot.commands.intake.IntakeCommand;
-import frc.robot.commands.intake.ReverseIntake;
+import frc.robot.commands.DriveWithJoysticks;
+import frc.robot.commands.FireCommand;
 import frc.robot.commands.arm.ArmCommand;
 import frc.robot.commands.arm.ArmLockCommand;
 import frc.robot.commands.arm.ManuelArmCommand;
 import frc.robot.commands.arm.ReverseArmLock;
+import frc.robot.commands.autonomous.PathPlanner;
+import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.shooter.ShooterCommand;
 import frc.robot.commands.shooter.ShooterSenderCommand;
 import frc.robot.enums.PositionType;
@@ -67,7 +68,7 @@ public class RobotContainer {
                 upSystemJoystick,
                 4
         ).whileTrue(
-               ArmCommand.forceNewInstance(PositionType.AMPHI)
+                ArmCommand.forceNewInstance(PositionType.AMPHI)
         );
 
         new JoystickButton(

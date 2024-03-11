@@ -1,7 +1,5 @@
 package frc.robot.commands;
 
-import java.util.Set;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -12,15 +10,15 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.poseestimation.PoseEstimation;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.utils.AllianceUtils;
+import java.util.Set;
 
 public class DriveWithJoysticks extends Command {
     private static DriveWithJoysticks instance = null;
 
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final PoseEstimation poseEstimation = PoseEstimation.getInstance();
-    private Joystick translation = null;
-
     private final Rotation2d fieldOrientationZeroOffset = new Rotation2d();
+    private Joystick translation = null;
 
     public DriveWithJoysticks() {
         Drivetrain.getInstance().resetEncoders();

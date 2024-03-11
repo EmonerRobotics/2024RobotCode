@@ -10,16 +10,13 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 public class PoseEstimation {
+    public static Field2d field = new Field2d();
     private static PoseEstimation instance = null;
-
     private final SwerveDrivePoseEstimator poseEstimator;
     private final TimeInterpolatableBuffer<Pose2d> poseHistory = TimeInterpolatableBuffer.createBuffer(1.5);
-
-    public static Field2d field = new Field2d();
 
     public PoseEstimation() {
         poseEstimator = new SwerveDrivePoseEstimator(
