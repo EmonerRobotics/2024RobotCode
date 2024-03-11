@@ -21,6 +21,9 @@ https://www.chiefdelphi.com/
 https://www.youtube.com/@0ToAuto
 https://www.youtube.com/watch?v=2n0JEsnK2QQ
 
+# Helpful GitHub repos
+https://github.com/SeanSun6814/FRC0ToAutonomous
+
 # Command extended class logics
 initialize() - Called when the command is initially scheduled.
 execute() - Called every time the scheduler runs while the command is scheduled.
