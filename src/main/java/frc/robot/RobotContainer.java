@@ -14,7 +14,6 @@ import frc.robot.commands.FireCommand;
 import frc.robot.commands.arm.ArmCommand;
 import frc.robot.commands.arm.ArmLockCommand;
 import frc.robot.commands.arm.ManuelArmCommand;
-import frc.robot.commands.arm.ReverseArmLock;
 import frc.robot.commands.autonomous.PathPlanner;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.ReverseIntake;
@@ -89,7 +88,7 @@ public class RobotContainer {
                 upSystemJoystick,
                 9
         ).whileTrue(
-                ReverseArmLock.getInstance()
+                ArmLockCommand.getInstance()
         );
     }
 
