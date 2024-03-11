@@ -9,20 +9,22 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.*;
-import frc.robot.commands.autonomous.PathPlanner;
-import frc.robot.commands.intake.IntakeCommand;
-import frc.robot.commands.intake.ReverseIntake;
-import frc.robot.commands.arm.ArmCommand;
-import frc.robot.commands.arm.ArmLockCommand;
-import frc.robot.commands.arm.ManuelArmCommand;
-import frc.robot.commands.arm.ReverseArmLock;
-import frc.robot.commands.shooter.ShooterCommand;
-import frc.robot.commands.shooter.ShooterSenderCommand;
-import frc.robot.enums.PositionType;
-import frc.robot.poseestimation.PoseEstimation;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.autonomous.FireCommand;
+import frc.robot.autonomous.PathPlanner;
+import frc.robot.core.Constants;
+import frc.robot.core.Robot;
+import frc.robot.core.enums.PositionType;
+import frc.robot.drivetrain.DriveWithJoysticks;
+import frc.robot.drivetrain.Drivetrain;
+import frc.robot.modules.internal.arm.ArmSubsystem;
+import frc.robot.modules.internal.arm.commands.ArmCommand;
+import frc.robot.modules.internal.arm.commands.ArmLockCommand;
+import frc.robot.modules.internal.arm.commands.ManuelArmCommand;
+import frc.robot.modules.internal.intake.IntakeType;
+import frc.robot.modules.internal.intake.commands.IntakeCommand;
+import frc.robot.modules.internal.shooter.commands.ShooterCommand;
+import frc.robot.modules.internal.shooter.commands.ShooterSenderCommand;
+import frc.robot.pose_estimation.PoseEstimation;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -60,21 +62,21 @@ public class RobotContainer {
                 upSystemJoystick,
                 3
         ).whileTrue(
-                ReverseIntake.getInstance()
+                IntakeCommand.getInstance(IntakeType.REVERSE)
         );
 
         new JoystickButton(
                 upSystemJoystick,
                 4
         ).whileTrue(
-               ArmCommand.forceNewInstance(PositionType.AMPHI)
+                ArmCommand.forceNewInstance(PositionType.AMPHI)
         );
 
         new JoystickButton(
                 upSystemJoystick,
                 5
         ).whileTrue(
-                IntakeCommand.getInstance()
+                IntakeCommand.getInstance(IntakeType.STANDARD)
         );
 
         new JoystickButton(
@@ -88,7 +90,7 @@ public class RobotContainer {
                 upSystemJoystick,
                 9
         ).whileTrue(
-                ReverseArmLock.getInstance()
+                ArmLockCommand.getInstance()
         );
     }
 
