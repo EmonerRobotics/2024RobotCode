@@ -4,18 +4,17 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.autonomous.FireCommand;
-import frc.robot.autonomous.PathPlanner;
+import frc.robot.autonomous.CenterToTarget;
 import frc.robot.core.Constants;
 import frc.robot.core.Robot;
 import frc.robot.core.enums.PositionType;
-import frc.robot.drivetrain.DriveWithJoysticks;
-import frc.robot.drivetrain.Drivetrain;
+import frc.robot.modules.internal.drivetrain.DriveSubsystem;
 import frc.robot.modules.internal.arm.ArmSubsystem;
 import frc.robot.modules.internal.arm.commands.ArmCommand;
 import frc.robot.modules.internal.arm.commands.ArmLockCommand;
@@ -24,7 +23,6 @@ import frc.robot.modules.internal.intake.IntakeType;
 import frc.robot.modules.internal.intake.commands.IntakeCommand;
 import frc.robot.modules.internal.shooter.commands.ShooterCommand;
 import frc.robot.modules.internal.shooter.commands.ShooterSenderCommand;
-import frc.robot.pose_estimation.PoseEstimation;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -37,10 +35,23 @@ public class RobotContainer {
     public static final Joystick upSystemJoystick = new Joystick(Constants.JoystickConstants.UpSystem);
 
     public RobotContainer() {
-        PathPlanner.setPathPlannerSettings();
+        //PathPlanner.setPathPlannerSettings();
         setupDefaults();
         configureUpSystemJoystickBindings();
         configureSwerveJoystickBindings();
+        setDrivetrainAxis();
+    }
+
+
+    private void setDrivetrainAxis() {
+        DriveSubsystem.getInstance().setDefaultCommand(
+                new RunCommand(
+                        () -> DriveSubsystem.getInstance().drive(
+                                -MathUtil.applyDeadband(swerveJoystick.getRawAxis(1), Constants.OIConstants.kDriveDeadband),
+                                -MathUtil.applyDeadband(swerveJoystick.getRawAxis(0), Constants.OIConstants.kDriveDeadband),
+                                -MathUtil.applyDeadband(swerveJoystick.getRawAxis(2), Constants.OIConstants.kDriveDeadband),
+                                true, true),
+                        DriveSubsystem.getInstance()));
     }
 
     private void configureUpSystemJoystickBindings() {
@@ -55,7 +66,8 @@ public class RobotContainer {
                 upSystemJoystick,
                 2
         ).onTrue(
-                new FireCommand().fireCommand()
+               // new FireCommand().fireCommand()
+                CenterToTarget.getInstance()
         );
 
         new JoystickButton(
@@ -95,24 +107,19 @@ public class RobotContainer {
     }
 
     private void configureSwerveJoystickBindings() {
-        new JoystickButton(
-                swerveJoystick,
-                8
-        ).whileTrue(
-                new RunCommand(
-                        Drivetrain.getInstance()::setX,
-                        Drivetrain.getInstance()
-                )
-        );
+        new JoystickButton(swerveJoystick, 8)
+                .whileTrue(new RunCommand(
+                        () -> DriveSubsystem.getInstance().setX(),
+                        DriveSubsystem.getInstance()));
 
         new JoystickButton(
                 swerveJoystick,
                 9
         ).onTrue(
                 new InstantCommand(() -> {
-                    PoseEstimation.getInstance().resetPose(
+                    DriveSubsystem.getInstance().resetOdometry(
                             new Pose2d(
-                                    PoseEstimation.getInstance().getEstimatedPose().getTranslation(),
+                                    DriveSubsystem.getInstance().getPose().getTranslation(),
                                     new Rotation2d()
                             )
                     );
@@ -142,8 +149,6 @@ public class RobotContainer {
     }
 
     private void setupDefaults() {
-        Drivetrain.getInstance().setDefaultCommand(DriveWithJoysticks.getInstance(swerveJoystick));
-
         ArmSubsystem.getInstance().setDefaultCommand(
                 new ManuelArmCommand(() -> upSystemJoystick.getRawAxis(1))
         );

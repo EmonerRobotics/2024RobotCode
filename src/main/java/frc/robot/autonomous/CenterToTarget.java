@@ -5,23 +5,35 @@
 package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.drivetrain.Drivetrain;
+import frc.robot.modules.internal.drivetrain.DriveSubsystem;
 import frc.robot.modules.external.limelight.LimelightSubsystem;
-import frc.robot.pose_estimation.PoseEstimation;
 
 public class CenterToTarget extends Command {
 
-    public static final int HORIZONTAL_MAX_ERROR_ANGLE = 1;
+    public static CenterToTarget instance = null;
+
+    public static final double HORIZONTAL_MAX_ERROR_ANGLE = 0.5;
     private final LimelightSubsystem limelightSubsystem = LimelightSubsystem.getInstance();
     private final PIDController pidController;
-    private final Drivetrain drivetrain = Drivetrain.getInstance();
-    private final PoseEstimation poseEstimation = PoseEstimation.getInstance();
+    private final DriveSubsystem driveSubsystem = DriveSubsystem.getInstance();
     private double speedY;
 
+    public static CenterToTarget getInstance() {
+        if (instance == null) {
+            instance = new CenterToTarget();
+        }
+        return instance;
+    }
+
     public CenterToTarget() {
-        this.pidController = new PIDController(0.04, 0.02, 0);
+        pidController = new PIDController(
+                0.03,
+                0.03,
+                0.01
+        );
+        //  pidController.setIZone(0.01);
+        pidController.setSetpoint(0);
         addRequirements(limelightSubsystem);
     }
 
@@ -32,41 +44,44 @@ public class CenterToTarget extends Command {
 
     @Override
     public void execute() {
-        System.out.println("CenterToTarget: executing");
+        System.out.println(limelightSubsystem.getEstimatedDistance());
 
-        if (limelightSubsystem.getTargetId() == 3 || limelightSubsystem.getTargetId() == 7) {
-            System.out.println("CenterToTarget: target id 3 or 7");
-            if (limelightSubsystem.isTargetDetected()) {
-                System.out.println("CenterToTarget: target detected");
-
-                pidController.setSetpoint(0);
-
-                speedY = pidController.calculate(limelightSubsystem.getHorizontalTargetOffsetAngle());
-                System.out.println("CENTER SPEED-Y:" + speedY);
-
-                ChassisSpeeds fieldRelSpeeds = new ChassisSpeeds(0, 0, speedY);
-                ChassisSpeeds robotRelSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                        fieldRelSpeeds,
-                        poseEstimation.getEstimatedPose().getRotation()
-                );
-
-                drivetrain.drive(robotRelSpeeds);
-            } else {
-                System.out.println("NO TARGET");
-            }
-        } else {
-            System.out.println("NO TARGET");
+        if (limelightSubsystem.getHorizontalTargetOffsetAngle() != 0) {
+            speedY = pidController.calculate(
+                    limelightSubsystem.getHorizontalTargetOffsetAngle()
+            );
         }
+
+        double actualSpeed;
+
+        if (limelightSubsystem.getEstimatedDistance() > 222) {
+            actualSpeed = speedY / 9;
+        } else {
+            actualSpeed = speedY / 5;
+        }
+
+
+        System.out.println("CENTER SPEED-Y:" + actualSpeed);
+        System.out.println("limeli:" + limelightSubsystem.getHorizontalTargetOffsetAngle());
+                driveSubsystem.drive(
+                        0,
+                        0,
+                        actualSpeed,
+                        true,
+                        false
+                );
     }
 
     @Override
     public void end(boolean interrupted) {
-        ChassisSpeeds fieldRelSpeeds = new ChassisSpeeds(0, 0, 0);
-        ChassisSpeeds robotRelSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                fieldRelSpeeds,
-                poseEstimation.getEstimatedPose().getRotation()
+        driveSubsystem.drive(
+                0,
+                0,
+                0,
+                true,
+                false
+
         );
-        drivetrain.drive(robotRelSpeeds);
 
     }
 
