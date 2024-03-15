@@ -1,13 +1,11 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.modules.internal.drivetrain.DriveSubsystem;
 import frc.robot.modules.external.limelight.LimelightSubsystem;
+
+import static frc.robot.core.utils.LoggingUtils.logMessage;
 
 public class CenterToTarget extends Command {
 
@@ -17,7 +15,8 @@ public class CenterToTarget extends Command {
     private final LimelightSubsystem limelightSubsystem = LimelightSubsystem.getInstance();
     private final PIDController pidController;
     private final DriveSubsystem driveSubsystem = DriveSubsystem.getInstance();
-    private double speedY;
+    private double centeringSpeed;
+    private boolean isTargetDetected;
 
     public static CenterToTarget getInstance() {
         if (instance == null) {
@@ -44,32 +43,38 @@ public class CenterToTarget extends Command {
 
     @Override
     public void execute() {
-        System.out.println(limelightSubsystem.getEstimatedDistance());
+        double currentLimelightAngle = limelightSubsystem.getHorizontalTargetOffsetAngle();
+        isTargetDetected = limelightSubsystem.isTargetDetected();
 
-        if (limelightSubsystem.getHorizontalTargetOffsetAngle() != 0) {
-            speedY = pidController.calculate(
-                    limelightSubsystem.getHorizontalTargetOffsetAngle()
+        if (isTargetDetected) {
+            centeringSpeed = pidController.calculate(
+                    currentLimelightAngle
             );
+        } else {
+            centeringSpeed = centeringSpeed * 0.7;
         }
 
-        double actualSpeed;
-
+        //double actualSpeed = centeringSpeed / (1 + (currentLimelightAngle / 90));
+        double actualSpeed = centeringSpeed * (1 + (currentLimelightAngle / 90));
+        /*
         if (limelightSubsystem.getEstimatedDistance() > 222) {
             actualSpeed = speedY / 9;
         } else {
             actualSpeed = speedY / 5;
         }
+         */
 
+        logMessage("Current Centering Speed:" + actualSpeed);
+        logMessage("Current Limelight Angle:" + currentLimelightAngle);
+        logMessage("Current Limelight Distance:" + limelightSubsystem.getEstimatedDistance());
 
-        System.out.println("CENTER SPEED-Y:" + actualSpeed);
-        System.out.println("limeli:" + limelightSubsystem.getHorizontalTargetOffsetAngle());
-                driveSubsystem.drive(
-                        0,
-                        0,
-                        actualSpeed,
-                        true,
-                        false
-                );
+        driveSubsystem.drive(
+                0,
+                0,
+                actualSpeed,
+                true,
+                false
+        );
     }
 
     @Override
@@ -87,8 +92,8 @@ public class CenterToTarget extends Command {
 
     @Override
     public boolean isFinished() {
-        boolean isTargetDetected = limelightSubsystem.isTargetDetected();
-        boolean isHorizontalTargetOffsetAngleErrorReached = Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < HORIZONTAL_MAX_ERROR_ANGLE;
+        boolean isHorizontalTargetOffsetAngleErrorReached =
+                Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < HORIZONTAL_MAX_ERROR_ANGLE;
 
         if (isHorizontalTargetOffsetAngleErrorReached && isTargetDetected) {
             System.out.println("CENTER end");
