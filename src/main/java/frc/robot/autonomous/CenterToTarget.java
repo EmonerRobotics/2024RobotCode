@@ -46,7 +46,6 @@ public class CenterToTarget extends Command {
 
     @Override
     public void execute() {
-        double currentLimelightDistance = limelightSubsystem.getEstimatedDistance();
         double currentLimelightAngle = limelightSubsystem.getHorizontalTargetOffsetAngle();
         isTargetDetected = limelightSubsystem.isTargetDetected();
 
