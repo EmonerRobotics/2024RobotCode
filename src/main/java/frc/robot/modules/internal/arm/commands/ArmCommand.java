@@ -13,6 +13,9 @@ import frc.robot.modules.internal.arm.ArmSubsystem;
 
 import java.util.Objects;
 
+import static frc.robot.core.utils.LoggingUtils.logEvent;
+import static frc.robot.core.utils.LoggingUtils.logMessage;
+
 public class ArmCommand extends Command {
     private static ArmCommand instance = null;
 
@@ -20,6 +23,7 @@ public class ArmCommand extends Command {
     private final LimelightSubsystem limelightSubsystem = LimelightSubsystem.getInstance();
     private final PIDController pidController;
     private PositionType positionType;
+    private boolean armLocked = false;
 
     private ArmCommand() {
         this.pidController = new PIDController(0, 0, 0);
@@ -39,7 +43,13 @@ public class ArmCommand extends Command {
     public static ArmCommand forceNewInstance(PositionType positionType) {
         instance = new ArmCommand();
         instance.setPIDController(positionType);
+        System.out.println("furkan 1");
+        logMessage("test test 1");
         return instance;
+    }
+
+    private void setArmLocked(){
+        armLocked = !armLocked;
     }
 
     private void setPIDController(PositionType positionType) {
@@ -55,11 +65,15 @@ public class ArmCommand extends Command {
 
     @Override
     public void initialize() {
+        logMessage("arm initialize");
+        setArmLocked();
+        logMessage("isArmLocked: " + armLocked);
         pidController.reset();
     }
 
     @Override
     public void execute() {
+        logMessage("arm execute");
         double armControlOutput = pidController.calculate(armSubsystem.getEncoderDegrees());
 
         if (positionType == PositionType.TARGET) {
@@ -72,19 +86,11 @@ public class ArmCommand extends Command {
     }
 
     @Override
-    public void end(boolean interrupted) {
-        if (positionType == PositionType.GROUND) {
-            System.out.println("GROUND end");
-        } else {
-            armSubsystem.manuelArmControl(0);
-        }
-
-    }
-
-    @Override
     public boolean isFinished() {
+        boolean commandShouldFinish = !armLocked;
+
         double errorMargin = armSubsystem.getEncoderDegrees() - positionType.positionDegree;
-        double threshold = 1.5;
+
 
         switch (positionType) {
             case TARGET:
@@ -93,17 +99,28 @@ public class ArmCommand extends Command {
                 break;
             case AMPHI:
                 SmartDashboard.putNumber("ARM AMPHI ERROR", errorMargin);
-                threshold = 1;
+
                 break;
 
         }
 
-        if (Math.abs(errorMargin) < threshold) {
-            System.out.println(positionType.name() + " finished");
-            return true;
-        } else {
-            return false;
-        }
+        return commandShouldFinish;
     }
+
+    @Override
+    public void end(boolean interrupted) {
+        logMessage("arm end");
+
+        setArmLocked();
+        logMessage("is arm locked in end: " + armLocked);
+
+        if (positionType == PositionType.GROUND) {
+            System.out.println("GROUND end");
+        } else {
+            armSubsystem.manuelArmControl(0);
+        }
+
+    }
+
 
 }

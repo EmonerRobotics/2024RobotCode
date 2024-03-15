@@ -24,6 +24,9 @@ import frc.robot.modules.internal.intake.commands.IntakeCommand;
 import frc.robot.modules.internal.shooter.commands.ShooterCommand;
 import frc.robot.modules.internal.shooter.commands.ShooterSenderCommand;
 
+import static frc.robot.core.utils.LoggingUtils.logEvent;
+import static frc.robot.core.utils.LoggingUtils.logMessage;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -80,7 +83,7 @@ public class RobotContainer {
         new JoystickButton(
                 upSystemJoystick,
                 4
-        ).whileTrue(
+        ).toggleOnTrue(
                 ArmCommand.forceNewInstance(PositionType.AMPHI)
         );
 
