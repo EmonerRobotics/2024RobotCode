@@ -28,7 +28,7 @@ public class CenterToTarget extends Command {
 
     public CenterToTarget() {
         pidController = new PIDController(
-                0.04,
+                0.042,
                 0.0,
                 0.0
         );
@@ -50,62 +50,89 @@ public class CenterToTarget extends Command {
         isTargetDetected = limelightSubsystem.isTargetDetected();
 
         if (isTargetDetected) {
-            if(currentLimelightAngle > cacheLimelightAngle){
-                centeringSpeed = pidController.calculate(
-                        cacheLimelightAngle
-                );
-                logMessage("cached: " + centeringSpeed);
-                logMessage("norm: " + pidController.calculate(
-                        currentLimelightAngle
-                ));
+            logMessage(String.valueOf(centeringSpeed));
+
+            if(centeringSpeed < 0) {
+                logMessage("soldan");
+                if(currentLimelightAngle > cacheLimelightAngle){
+                    centeringSpeed = pidController.calculate(
+                            cacheLimelightAngle
+                    );
+                }
+                else {
+                    centeringSpeed = pidController.calculate(
+                            currentLimelightAngle
+                    );
+                    cacheLimelightAngle = currentLimelightAngle;
+
+                }
             }
             else {
-                centeringSpeed = pidController.calculate(
-                        currentLimelightAngle
-                );
-                cacheLimelightAngle = currentLimelightAngle;
-                logMessage("standard: " + centeringSpeed);
+                logMessage("sagdan");
+
+                logMessage("currentLimelightAngle: " + currentLimelightAngle);
+                logMessage("cacheLimelightAngle: " + cacheLimelightAngle);
+                logMessage("is current bigger than cache: " + String.valueOf(currentLimelightAngle > cacheLimelightAngle));
+
+                if(currentLimelightAngle < cacheLimelightAngle){
+                    logMessage("current bigger than cache: " + String.valueOf(currentLimelightAngle > cacheLimelightAngle));
+
+                    centeringSpeed = pidController.calculate(
+                            cacheLimelightAngle
+                    );
+                }
+                else {
+                    logMessage("cache bigger than current: " + String.valueOf(currentLimelightAngle > cacheLimelightAngle));
+
+                    centeringSpeed = pidController.calculate(
+                            currentLimelightAngle
+                    );
+                    cacheLimelightAngle = currentLimelightAngle;
+                }
             }
+
+
+
+            if(centeringSpeed < 0) {
+                if(centeringSpeed > -0.045){
+                    centeringSpeed = -0.05;
+                }else {
+                    centeringSpeed = centeringSpeed / 3.2;
+                }
+            }
+            else {
+                if(centeringSpeed < 0.045){
+                    centeringSpeed = 0.05;
+                }else {
+                    centeringSpeed = centeringSpeed / 3.2;
+                }
+            }
+
+
+
+            driveSubsystem.drive(
+                    0,
+                    0,
+                    centeringSpeed,
+                    true,
+                    false
+            );
+
+
         } else {
-            logMessage("Speed cached:" + centeringSpeed);
+            logMessage("else situ: " + cacheLimelightAngle);
+
+            /*
             centeringSpeed = pidController.calculate(
                     cacheLimelightAngle
             );
 
+             */
         }
 
 
-        //double actualSpeed = centeringSpeed / (1 + (currentLimelightAngle / 90));
-       // double actualSpeed = centeringSpeed / (1 + (currentLimelightDistance / 70));
 
 
-        if (limelightSubsystem.getEstimatedDistance() > 222) {
-      //      centeringSpeed = centeringSpeed / 6;
-        } else {
-     //       centeringSpeed = centeringSpeed / 3;
-        }
-
-        //26.17
-
-        logMessage("Current Centering Speed:" + centeringSpeed);
-        logMessage("Current Limelight Angle:" + currentLimelightAngle);
-        logMessage("*********************************************");
-
-        /*
-        if(centeringSpeed / 3 < 0.03){
-            centeringSpeed = 0.03;
-        }else {
-            centeringSpeed = centeringSpeed / 3;
-        }
-        */
-
-        driveSubsystem.drive(
-                0,
-                0,
-                centeringSpeed,
-                true,
-                false
-        );
     }
 
     @Override
@@ -126,7 +153,7 @@ public class CenterToTarget extends Command {
         boolean isHorizontalTargetOffsetAngleErrorReached =
                 Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < HORIZONTAL_MAX_ERROR_ANGLE;
 
-        if (isHorizontalTargetOffsetAngleErrorReached && isTargetDetected) {
+        if (isHorizontalTargetOffsetAngleErrorReached || !isTargetDetected) {
             System.out.println("CENTER end");
             return true;
         }
