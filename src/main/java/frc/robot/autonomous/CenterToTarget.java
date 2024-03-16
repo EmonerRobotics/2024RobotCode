@@ -52,9 +52,13 @@ public class CenterToTarget extends Command {
         if (isTargetDetected) {
             logMessage(String.valueOf(centeringSpeed));
 
+            //centering speed daha onceden bir degiskene atanmamis
             if(centeringSpeed < 0) {
                 logMessage("soldan");
+                //tX > tag ile aramdaki mesafeden neredeyse hicbir zaman buyuk olamaz
                 if(currentLimelightAngle > cacheLimelightAngle){
+                    //bazen gelen 219 gibi sayilar bu yuzden olabilir
+                    //centering speed ilk kez burda hesaplaniyor ancak 56. satirda kontrol ediliyor
                     centeringSpeed = pidController.calculate(
                             cacheLimelightAngle
                     );
@@ -73,7 +77,7 @@ public class CenterToTarget extends Command {
                 logMessage("currentLimelightAngle: " + currentLimelightAngle);
                 logMessage("cacheLimelightAngle: " + cacheLimelightAngle);
                 logMessage("is current bigger than cache: " + String.valueOf(currentLimelightAngle > cacheLimelightAngle));
-
+                //tx degeri tag ile aradaki mesafeden her zaman daha kucuktur
                 if(currentLimelightAngle < cacheLimelightAngle){
                     logMessage("current bigger than cache: " + String.valueOf(currentLimelightAngle > cacheLimelightAngle));
 
