@@ -1,82 +1,215 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.drivetrain.Drivetrain;
+import frc.robot.autonomous.enums.CenteringStartPosition;
+import frc.robot.modules.internal.drivetrain.DriveSubsystem;
 import frc.robot.modules.external.limelight.LimelightSubsystem;
-import frc.robot.pose_estimation.PoseEstimation;
+
+import static frc.robot.core.utils.LoggingUtils.logMessage;
 
 public class CenterToTarget extends Command {
 
-    public static final int HORIZONTAL_MAX_ERROR_ANGLE = 1;
+    public static CenterToTarget instance = null;
+
+    public static final double HORIZONTAL_MAX_ERROR_ANGLE = 0.7;
+    public static final double MINIMUM_SPEED_THRESHOLD = 0.045;
+    public static final double MINIMUM_SPEED = 0.05;
+    public static final double SPEED_DIVIDER = 3.2;
+
     private final LimelightSubsystem limelightSubsystem = LimelightSubsystem.getInstance();
     private final PIDController pidController;
-    private final Drivetrain drivetrain = Drivetrain.getInstance();
-    private final PoseEstimation poseEstimation = PoseEstimation.getInstance();
-    private double speedY;
+    private final DriveSubsystem driveSubsystem = DriveSubsystem.getInstance();
+    private double centeringSpeed;
+    private double cacheLimelightAngle;
+
+    public static CenterToTarget getInstance() {
+        if (instance == null) {
+            instance = new CenterToTarget();
+        }
+        return instance;
+    }
 
     public CenterToTarget() {
-        this.pidController = new PIDController(0.04, 0.02, 0);
+        pidController = new PIDController(
+                0.042,
+                0.0,
+                0.0
+        );
+        pidController.setSetpoint(0);
+
         addRequirements(limelightSubsystem);
     }
+
+    private double getCurrentLimelightAngle() {
+        return limelightSubsystem.getHorizontalTargetOffsetAngle();
+    }
+
+    private boolean isCurrentAngleBiggerThanCache(double currentLimelightAngle) {
+        return currentLimelightAngle > cacheLimelightAngle;
+    }
+
+    private boolean isTargetDetected() {
+        return limelightSubsystem.isTargetDetected();
+    }
+
+    private double calculateCenteringSpeedWithPid(double angle) {
+        return pidController.calculate(
+                angle
+        );
+    }
+
+    private void setLimelightCacheWithNewAngle(double currentLimelightAngle) {
+        logMessage("CACHE set");
+        cacheLimelightAngle = currentLimelightAngle;
+    }
+
+    public CenteringStartPosition getStartingPosition() {
+        if (centeringSpeed < 0) {
+            return CenteringStartPosition.LEFT;
+        } else {
+            return CenteringStartPosition.RIGHT;
+        }
+    }
+
+
+    private double slowDownCenteringSpeed(double speedDivider) {
+        return centeringSpeed / speedDivider;
+    }
+
+    private double determineCenteringSpeedLowLimit() {
+        switch (getStartingPosition()) {
+            case LEFT:
+                if (centeringSpeed > -MINIMUM_SPEED_THRESHOLD) {
+                    return -MINIMUM_SPEED;
+                } else {
+                    return slowDownCenteringSpeed(SPEED_DIVIDER);
+                }
+            case RIGHT:
+                if (centeringSpeed < MINIMUM_SPEED_THRESHOLD) {
+                  //  logMessage("set minimum speed");
+                    return MINIMUM_SPEED;
+                } else {
+                   // logMessage("divide speed");
+                    return slowDownCenteringSpeed(SPEED_DIVIDER);
+                }
+            default:
+                return 0;
+        }
+    }
+
+    private void setCenteringSpeed(double centeringSpeed) {
+        logMessage("set centering speed" + String.valueOf(centeringSpeed));
+        this.centeringSpeed = centeringSpeed;
+    }
+
+    /*
+    private void updateCenteringSpeedForAnamolies(
+            double currentLimelightAngle
+    ) {
+        if (isCurrentAngleBiggerThanCache(currentLimelightAngle)) {
+            updateSpeedForLeftPosition();
+        } else {
+            updateSpeedForRightPosition(currentLimelightAngle);
+        }
+    }
+
+     */
+
+    private void updateCenteringSpeedForAnamolies(
+            double currentLimelightAngle
+    ) {
+        switch (getStartingPosition()) {
+            case LEFT:
+                if (isCurrentAngleBiggerThanCache(currentLimelightAngle)) {
+                    double newSpeed = calculateCenteringSpeedWithPid(cacheLimelightAngle);
+                    setCenteringSpeed(newSpeed);
+                } else {
+                    double newSpeed = calculateCenteringSpeedWithPid(currentLimelightAngle);
+                    setCenteringSpeed(newSpeed);
+                    setLimelightCacheWithNewAngle(currentLimelightAngle);
+                }
+                break;
+            case RIGHT:
+                if (!isCurrentAngleBiggerThanCache(currentLimelightAngle)) {
+                    double newSpeed = calculateCenteringSpeedWithPid(cacheLimelightAngle);
+                    setCenteringSpeed(newSpeed);
+                } else {
+                    double newSpeed = calculateCenteringSpeedWithPid(currentLimelightAngle);
+                    setCenteringSpeed(newSpeed);
+                    setLimelightCacheWithNewAngle(currentLimelightAngle);
+                }
+                break;
+        }
+    }
+
+    private void updateSpeedForLeftPosition() {
+        logMessage("LEFT");
+        double newSpeed = calculateCenteringSpeedWithPid(cacheLimelightAngle);
+        setCenteringSpeed(newSpeed);
+    }
+
+    private void updateSpeedForRightPosition(double currentLimelightAngle) {
+        logMessage("RIGHT");
+        double newSpeed = calculateCenteringSpeedWithPid(currentLimelightAngle);
+        setCenteringSpeed(newSpeed);
+        setLimelightCacheWithNewAngle(currentLimelightAngle);
+    }
+
 
     @Override
     public void initialize() {
         System.out.println("CENTER BASLADI");
+        cacheLimelightAngle = limelightSubsystem.getHorizontalTargetOffsetAngle();
+        logMessage(String.valueOf(cacheLimelightAngle));
     }
 
     @Override
     public void execute() {
-        System.out.println("CenterToTarget: executing");
+        if (isTargetDetected()) {
+            logMessage("Centering Speed: " + String.valueOf(centeringSpeed));
 
-        if (limelightSubsystem.getTargetId() == 3 || limelightSubsystem.getTargetId() == 7) {
-            System.out.println("CenterToTarget: target id 3 or 7");
-            if (limelightSubsystem.isTargetDetected()) {
-                System.out.println("CenterToTarget: target detected");
+            updateCenteringSpeedForAnamolies(
+                    getCurrentLimelightAngle()
+            );
 
-                pidController.setSetpoint(0);
+            setCenteringSpeed(determineCenteringSpeedLowLimit());
+            logMessage("Centering Speed Low Limit: " + String.valueOf(determineCenteringSpeedLowLimit()));
 
-                speedY = pidController.calculate(limelightSubsystem.getHorizontalTargetOffsetAngle());
-                System.out.println("CENTER SPEED-Y:" + speedY);
+            driveSubsystem.drive(
+                    0,
+                    0,
+                    centeringSpeed,
+                    true,
+                    false
+            );
 
-                ChassisSpeeds fieldRelSpeeds = new ChassisSpeeds(0, 0, speedY);
-                ChassisSpeeds robotRelSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                        fieldRelSpeeds,
-                        poseEstimation.getEstimatedPose().getRotation()
-                );
-
-                drivetrain.drive(robotRelSpeeds);
-            } else {
-                System.out.println("NO TARGET");
-            }
         } else {
-            System.out.println("NO TARGET");
+            logMessage("NO TARGET: " + cacheLimelightAngle);
         }
+
     }
 
     @Override
     public void end(boolean interrupted) {
-        ChassisSpeeds fieldRelSpeeds = new ChassisSpeeds(0, 0, 0);
-        ChassisSpeeds robotRelSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                fieldRelSpeeds,
-                poseEstimation.getEstimatedPose().getRotation()
+        driveSubsystem.drive(
+                0,
+                0,
+                0,
+                true,
+                false
+
         );
-        drivetrain.drive(robotRelSpeeds);
 
     }
 
     @Override
     public boolean isFinished() {
-        boolean isTargetDetected = limelightSubsystem.isTargetDetected();
-        boolean isHorizontalTargetOffsetAngleErrorReached = Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < HORIZONTAL_MAX_ERROR_ANGLE;
+        boolean isHorizontalTargetOffsetAngleErrorReached =
+                Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < HORIZONTAL_MAX_ERROR_ANGLE;
 
-        if (isHorizontalTargetOffsetAngleErrorReached && isTargetDetected) {
-            System.out.println("CENTER end");
+        if (isHorizontalTargetOffsetAngleErrorReached || !isTargetDetected()) {
+            logMessage("CENTER end");
             return true;
         }
 
