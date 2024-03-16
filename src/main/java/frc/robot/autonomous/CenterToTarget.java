@@ -76,6 +76,10 @@ public class CenterToTarget extends Command {
 
     }
 
+    private boolean isCurrentAngleBiggerThanCache(){
+        return currentLimelightAngle > cacheLimelightAngle;
+    }
+
     private void setCenteringSpeedWithPid(
             double angle
     ) {
@@ -99,7 +103,7 @@ public class CenterToTarget extends Command {
     private void updateCenteringSpeedForAnamolies() {
         switch (getStartingPosition()) {
             case LEFT:
-                if (currentLimelightAngle > cacheLimelightAngle) {
+                if (isCurrentAngleBiggerThanCache()) {
                     setCenteringSpeedWithPid(cacheLimelightAngle);
                 } else {
                     setCenteringSpeedWithPid(currentLimelightAngle);
@@ -107,7 +111,7 @@ public class CenterToTarget extends Command {
                 }
                 break;
             case RIGHT:
-                if (currentLimelightAngle < cacheLimelightAngle) {
+                if (!isCurrentAngleBiggerThanCache()) {
                     setCenteringSpeedWithPid(cacheLimelightAngle);
                 } else {
                     setCenteringSpeedWithPid(currentLimelightAngle);
