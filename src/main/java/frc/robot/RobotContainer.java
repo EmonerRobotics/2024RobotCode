@@ -24,139 +24,113 @@ import frc.robot.modules.internal.intake.commands.IntakeCommand;
 import frc.robot.modules.internal.shooter.commands.ShooterCommand;
 import frc.robot.modules.internal.shooter.commands.ShooterSenderCommand;
 
-import static frc.robot.core.utils.LoggingUtils.logEvent;
-import static frc.robot.core.utils.LoggingUtils.logMessage;
-
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-    public static final Joystick swerveJoystick = new Joystick(Constants.JoystickConstants.SwerveJoystick);
-    public static final Joystick upSystemJoystick = new Joystick(Constants.JoystickConstants.UpSystem);
+  public static final Joystick swerveJoystick = new Joystick(Constants.JoystickConstants.SwerveJoystick);
+  public static final Joystick upSystemJoystick = new Joystick(Constants.JoystickConstants.UpSystem);
 
-    public RobotContainer() {
-        //PathPlanner.setPathPlannerSettings();
-        setupDefaults();
-        configureUpSystemJoystickBindings();
-        configureSwerveJoystickBindings();
-        setDrivetrainAxis();
-    }
+  public RobotContainer() {
+    // PathPlanner.setPathPlannerSettings();
+    setupDefaults();
+    configureUpSystemJoystickBindings();
+    configureSwerveJoystickBindings();
+    setDrivetrainAxis();
+  }
 
+  private void setDrivetrainAxis() {
+    DriveSubsystem.getInstance().setDefaultCommand(
+        new RunCommand(
+            () -> DriveSubsystem.getInstance().drive(
+                -MathUtil.applyDeadband(swerveJoystick.getRawAxis(1), Constants.OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(swerveJoystick.getRawAxis(0), Constants.OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(swerveJoystick.getRawAxis(2), Constants.OIConstants.kDriveDeadband),
+                true, true),
+            DriveSubsystem.getInstance()));
+  }
 
-    private void setDrivetrainAxis() {
-        DriveSubsystem.getInstance().setDefaultCommand(
-                new RunCommand(
-                        () -> DriveSubsystem.getInstance().drive(
-                                -MathUtil.applyDeadband(swerveJoystick.getRawAxis(1), Constants.OIConstants.kDriveDeadband),
-                                -MathUtil.applyDeadband(swerveJoystick.getRawAxis(0), Constants.OIConstants.kDriveDeadband),
-                                -MathUtil.applyDeadband(swerveJoystick.getRawAxis(2), Constants.OIConstants.kDriveDeadband),
-                                true, true),
-                        DriveSubsystem.getInstance()));
-    }
+  private void configureUpSystemJoystickBindings() {
+    new JoystickButton(
+        upSystemJoystick,
+        1).whileTrue(
+            ShooterSenderCommand.forceNewInstance());
 
-    private void configureUpSystemJoystickBindings() {
-        new JoystickButton(
-                upSystemJoystick,
-                1
-        ).whileTrue(
-                ShooterSenderCommand.forceNewInstance()
-        );
+    new JoystickButton(
+        upSystemJoystick,
+        2).onTrue(
+            // new FireCommand().fireCommand()
+            CenterToTarget.getInstance());
 
-        new JoystickButton(
-                upSystemJoystick,
-                2
-        ).onTrue(
-               // new FireCommand().fireCommand()
-                CenterToTarget.getInstance()
-        );
+    new JoystickButton(
+        upSystemJoystick,
+        3).whileTrue(
+            IntakeCommand.getInstance(IntakeType.REVERSE));
 
-        new JoystickButton(
-                upSystemJoystick,
-                3
-        ).whileTrue(
-                IntakeCommand.getInstance(IntakeType.REVERSE)
-        );
+    new JoystickButton(
+        upSystemJoystick,
+        4).toggleOnTrue(
+            ArmCommand.forceNewInstance(PositionType.AMPHI));
 
-        new JoystickButton(
-                upSystemJoystick,
-                4
-        ).toggleOnTrue(
-                ArmCommand.forceNewInstance(PositionType.AMPHI)
-        );
+    new JoystickButton(
+        upSystemJoystick,
+        5).whileTrue(
+            IntakeCommand.getInstance(IntakeType.STANDARD));
 
-        new JoystickButton(
-                upSystemJoystick,
-                5
-        ).whileTrue(
-                IntakeCommand.getInstance(IntakeType.STANDARD)
-        );
+    new JoystickButton(
+        upSystemJoystick,
+        6).whileTrue(
+            ShooterCommand.getInstance());
 
-        new JoystickButton(
-                upSystemJoystick,
-                6
-        ).whileTrue(
-                ShooterCommand.getInstance()
-        );
+    new JoystickButton(
+        upSystemJoystick,
+        9).whileTrue(
+            ArmLockCommand.getInstance());
+  }
 
-        new JoystickButton(
-                upSystemJoystick,
-                9
-        ).whileTrue(
-                ArmLockCommand.getInstance()
-        );
-    }
+  private void configureSwerveJoystickBindings() {
+    new JoystickButton(swerveJoystick, 8)
+        .whileTrue(new RunCommand(
+            () -> DriveSubsystem.getInstance().setX(),
+            DriveSubsystem.getInstance()));
 
-    private void configureSwerveJoystickBindings() {
-        new JoystickButton(swerveJoystick, 8)
-                .whileTrue(new RunCommand(
-                        () -> DriveSubsystem.getInstance().setX(),
-                        DriveSubsystem.getInstance()));
+    new JoystickButton(
+        swerveJoystick,
+        9).onTrue(
+            new InstantCommand(() -> {
+              DriveSubsystem.getInstance().resetOdometry(
+                  new Pose2d(
+                      DriveSubsystem.getInstance().getPose().getTranslation(),
+                      new Rotation2d()));
+            }));
 
-        new JoystickButton(
-                swerveJoystick,
-                9
-        ).onTrue(
-                new InstantCommand(() -> {
-                    DriveSubsystem.getInstance().resetOdometry(
-                            new Pose2d(
-                                    DriveSubsystem.getInstance().getPose().getTranslation(),
-                                    new Rotation2d()
-                            )
-                    );
-                })
-        );
+    new JoystickButton(
+        swerveJoystick,
+        10).whileTrue(
+            ArmLockCommand.getInstance());
 
-        new JoystickButton(
-                swerveJoystick,
-                10
-        ).whileTrue(
-                ArmLockCommand.getInstance()
-        );
+  }
 
-    }
+  public Command getAutonomousCommand() {
+    return new ParallelCommandGroup(
+        ShooterCommand.getInstance(),
+        new SequentialCommandGroup(
+            ArmCommand.getInstance(PositionType.TARGET),
+            new WaitCommand(0.3),
+            new ShooterSenderCommand(),
+            ArmCommand.getInstance(PositionType.GROUND)));
 
-    public Command getAutonomousCommand() {
-        return new ParallelCommandGroup(
-                ShooterCommand.getInstance(),
-                new SequentialCommandGroup(
-                        ArmCommand.getInstance(PositionType.TARGET),
-                        new WaitCommand(0.3),
-                        new ShooterSenderCommand(),
-                        ArmCommand.getInstance(PositionType.GROUND)
-                )
-        );
+  }
 
-    }
-
-    private void setupDefaults() {
-        ArmSubsystem.getInstance().setDefaultCommand(
-                new ManuelArmCommand(() -> upSystemJoystick.getRawAxis(1))
-        );
-    }
+  private void setupDefaults() {
+    ArmSubsystem.getInstance().setDefaultCommand(
+        new ManuelArmCommand(() -> upSystemJoystick.getRawAxis(1)));
+  }
 
 }
-
-
