@@ -52,36 +52,7 @@ public class CenterToTarget extends Command {
         if (isTargetDetected) {
             logMessage(String.valueOf(centeringSpeed));
 
-            if(centeringSpeed < 0) {
-                logMessage("soldan");
-                if(currentLimelightAngle > cacheLimelightAngle){
-                    centeringSpeed = pidController.calculate(
-                            cacheLimelightAngle
-                    );
-                }
-                else {
-                    centeringSpeed = pidController.calculate(
-                            currentLimelightAngle
-                    );
-                    cacheLimelightAngle = currentLimelightAngle;
-
-                }
-            }
-            else {
-                if(currentLimelightAngle < cacheLimelightAngle){
-                    centeringSpeed = pidController.calculate(
-                            cacheLimelightAngle
-                    );
-                }
-                else {
-                    centeringSpeed = pidController.calculate(
-                            currentLimelightAngle
-                    );
-                    cacheLimelightAngle = currentLimelightAngle;
-                }
-            }
-
-
+            updateCenteringSpeedWithAnamolies(currentLimelightAngle);
 
             if(centeringSpeed < 0) {
                 if(centeringSpeed > -0.045){
@@ -98,8 +69,6 @@ public class CenterToTarget extends Command {
                 }
             }
 
-
-
             driveSubsystem.drive(
                     0,
                     0,
@@ -110,18 +79,41 @@ public class CenterToTarget extends Command {
 
         } else {
             logMessage("else situ: " + cacheLimelightAngle);
-
-            /*
-            centeringSpeed = pidController.calculate(
-                    cacheLimelightAngle
-            );
-
-             */
         }
 
+    }
 
+    private void updateCenteringSpeedWithAnamolies(
+            double currentLimelightAngle
+    ) {
+        if(centeringSpeed < 0) {
+            logMessage("soldan");
+            if(currentLimelightAngle > cacheLimelightAngle){
+                centeringSpeed = pidController.calculate(
+                        cacheLimelightAngle
+                );
+            }
+            else {
+                centeringSpeed = pidController.calculate(
+                        currentLimelightAngle
+                );
+                cacheLimelightAngle = currentLimelightAngle;
 
-
+            }
+        }
+        else {
+            if(currentLimelightAngle < cacheLimelightAngle){
+                centeringSpeed = pidController.calculate(
+                        cacheLimelightAngle
+                );
+            }
+            else {
+                centeringSpeed = pidController.calculate(
+                        currentLimelightAngle
+                );
+                cacheLimelightAngle = currentLimelightAngle;
+            }
+        }
     }
 
     @Override
