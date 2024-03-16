@@ -12,9 +12,9 @@ public class CenterToTarget extends Command {
 
     public static CenterToTarget instance = null;
 
-    public static final double HORIZONTAL_MAX_ERROR_ANGLE = 0.7;
+    public static final double HORIZONTAL_MAX_ERROR_ANGLE = 1.4;
     public static final double MINIMUM_SPEED_THRESHOLD = 0.045;
-    public static final double MINIMUM_SPEED = 0.05;
+    public static final double MINIMUM_SPEED = 0.06;
     public static final double SPEED_DIVIDER = 3.2;
 
     private final LimelightSubsystem limelightSubsystem = LimelightSubsystem.getInstance();
@@ -142,20 +142,6 @@ public class CenterToTarget extends Command {
                 break;
         }
     }
-
-    private void updateSpeedForLeftPosition() {
-        logMessage("LEFT");
-        double newSpeed = calculateCenteringSpeedWithPid(cacheLimelightAngle);
-        setCenteringSpeed(newSpeed);
-    }
-
-    private void updateSpeedForRightPosition(double currentLimelightAngle) {
-        logMessage("RIGHT");
-        double newSpeed = calculateCenteringSpeedWithPid(currentLimelightAngle);
-        setCenteringSpeed(newSpeed);
-        setLimelightCacheWithNewAngle(currentLimelightAngle);
-    }
-
 
     @Override
     public void initialize() {
