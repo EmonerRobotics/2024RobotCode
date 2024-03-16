@@ -2,6 +2,7 @@ package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.autonomous.enums.CenteringStartPosition;
 import frc.robot.modules.internal.drivetrain.DriveSubsystem;
 import frc.robot.modules.external.limelight.LimelightSubsystem;
 
@@ -12,12 +13,17 @@ public class CenterToTarget extends Command {
     public static CenterToTarget instance = null;
 
     public static final double HORIZONTAL_MAX_ERROR_ANGLE = 0.7;
+    public static final double MINIMUM_SPEED_THRESHOLD = 0.045;
+    public static final double MINIMUM_SPEED = 0.05;
+    public static final double SPEED_DIVIDER = 3.2;
+
     private final LimelightSubsystem limelightSubsystem = LimelightSubsystem.getInstance();
     private final PIDController pidController;
     private final DriveSubsystem driveSubsystem = DriveSubsystem.getInstance();
     private double centeringSpeed;
     private boolean isTargetDetected;
     private double cacheLimelightAngle;
+    private double currentLimelightAngle;
 
     public static CenterToTarget getInstance() {
         if (instance == null) {
@@ -46,28 +52,15 @@ public class CenterToTarget extends Command {
 
     @Override
     public void execute() {
-        double currentLimelightAngle = limelightSubsystem.getHorizontalTargetOffsetAngle();
+        currentLimelightAngle = limelightSubsystem.getHorizontalTargetOffsetAngle();
         isTargetDetected = limelightSubsystem.isTargetDetected();
 
         if (isTargetDetected) {
             logMessage(String.valueOf(centeringSpeed));
 
-            updateCenteringSpeedWithAnamolies(currentLimelightAngle);
+            updateCenteringSpeedForAnamolies();
 
-            if(centeringSpeed < 0) {
-                if(centeringSpeed > -0.045){
-                    centeringSpeed = -0.05;
-                }else {
-                    centeringSpeed = centeringSpeed / 3.2;
-                }
-            }
-            else {
-                if(centeringSpeed < 0.045){
-                    centeringSpeed = 0.05;
-                }else {
-                    centeringSpeed = centeringSpeed / 3.2;
-                }
-            }
+            setCenteringSpeedLowLimit();
 
             driveSubsystem.drive(
                     0,
@@ -78,41 +71,68 @@ public class CenterToTarget extends Command {
             );
 
         } else {
-            logMessage("else situ: " + cacheLimelightAngle);
+            logMessage("NO TARGET: " + cacheLimelightAngle);
         }
 
     }
 
-    private void updateCenteringSpeedWithAnamolies(
-            double currentLimelightAngle
+    private void setCenteringSpeedWithPid(
+            double angle
     ) {
-        if(centeringSpeed < 0) {
-            logMessage("soldan");
-            if(currentLimelightAngle > cacheLimelightAngle){
-                centeringSpeed = pidController.calculate(
-                        cacheLimelightAngle
-                );
-            }
-            else {
-                centeringSpeed = pidController.calculate(
-                        currentLimelightAngle
-                );
-                cacheLimelightAngle = currentLimelightAngle;
+        centeringSpeed = pidController.calculate(
+                angle
+        );
+    }
 
-            }
+    private void setLimelightCacheWithNewAngle() {
+        cacheLimelightAngle = currentLimelightAngle;
+    }
+
+    public CenteringStartPosition getStartingPosition() {
+        if (centeringSpeed < 0) {
+            return CenteringStartPosition.LEFT;
+        } else {
+            return CenteringStartPosition.RIGHT;
         }
-        else {
-            if(currentLimelightAngle < cacheLimelightAngle){
-                centeringSpeed = pidController.calculate(
-                        cacheLimelightAngle
-                );
-            }
-            else {
-                centeringSpeed = pidController.calculate(
-                        currentLimelightAngle
-                );
-                cacheLimelightAngle = currentLimelightAngle;
-            }
+    }
+
+    private void updateCenteringSpeedForAnamolies() {
+        switch (getStartingPosition()) {
+            case LEFT:
+                if (currentLimelightAngle > cacheLimelightAngle) {
+                    setCenteringSpeedWithPid(cacheLimelightAngle);
+                } else {
+                    setCenteringSpeedWithPid(currentLimelightAngle);
+                    setLimelightCacheWithNewAngle();
+                }
+                break;
+            case RIGHT:
+                if (currentLimelightAngle < cacheLimelightAngle) {
+                    setCenteringSpeedWithPid(cacheLimelightAngle);
+                } else {
+                    setCenteringSpeedWithPid(currentLimelightAngle);
+                    setLimelightCacheWithNewAngle();
+                }
+                break;
+        }
+    }
+
+    private void setCenteringSpeedLowLimit() {
+        switch (getStartingPosition()) {
+            case LEFT:
+                if (centeringSpeed > -MINIMUM_SPEED_THRESHOLD) {
+                    centeringSpeed = -MINIMUM_SPEED;
+                } else {
+                    centeringSpeed = centeringSpeed / SPEED_DIVIDER;
+                }
+                break;
+            case RIGHT:
+                if (centeringSpeed < MINIMUM_SPEED_THRESHOLD) {
+                    centeringSpeed = MINIMUM_SPEED;
+                } else {
+                    centeringSpeed = centeringSpeed / SPEED_DIVIDER;
+                }
+                break;
         }
     }
 
