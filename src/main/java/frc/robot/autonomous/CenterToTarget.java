@@ -41,6 +41,42 @@ public class CenterToTarget extends Command {
         addRequirements(limelightSubsystem);
     }
 
+    private double getCurrentLimelightAngle() {
+        return limelightSubsystem.getHorizontalTargetOffsetAngle();
+    }
+
+    private boolean isCurrentAngleBiggerThanCache(double currentLimelightAngle) {
+        return currentLimelightAngle > cacheLimelightAngle;
+    }
+
+    private boolean isTargetDetected() {
+        return limelightSubsystem.isTargetDetected();
+    }
+
+    private double calculateCenteringSpeedWithPid(double angle) {
+        return pidController.calculate(
+                angle
+        );
+    }
+
+    private void setLimelightCacheWithNewAngle(double currentLimelightAngle) {
+        logMessage("CACHE set");
+        cacheLimelightAngle = currentLimelightAngle;
+    }
+
+    public CenteringStartPosition getStartingPosition() {
+        if (centeringSpeed < 0) {
+            return CenteringStartPosition.LEFT;
+        } else {
+            return CenteringStartPosition.RIGHT;
+        }
+    }
+
+
+    private double slowDownCenteringSpeed(double speedDivider) {
+        return centeringSpeed / speedDivider;
+    }
+
     private double determineCenteringSpeedLowLimit() {
         switch (getStartingPosition()) {
             case LEFT:
@@ -51,8 +87,10 @@ public class CenterToTarget extends Command {
                 }
             case RIGHT:
                 if (centeringSpeed < MINIMUM_SPEED_THRESHOLD) {
+                  //  logMessage("set minimum speed");
                     return MINIMUM_SPEED;
                 } else {
+                   // logMessage("divide speed");
                     return slowDownCenteringSpeed(SPEED_DIVIDER);
                 }
             default:
@@ -60,9 +98,23 @@ public class CenterToTarget extends Command {
         }
     }
 
-    private double getCurrentLimelightAngle() {
-        return limelightSubsystem.getHorizontalTargetOffsetAngle();
+    private void setCenteringSpeed(double centeringSpeed) {
+        logMessage("set centering speed" + String.valueOf(centeringSpeed));
+        this.centeringSpeed = centeringSpeed;
     }
+
+    /*
+    private void updateCenteringSpeedForAnamolies(
+            double currentLimelightAngle
+    ) {
+        if (isCurrentAngleBiggerThanCache(currentLimelightAngle)) {
+            updateSpeedForLeftPosition();
+        } else {
+            updateSpeedForRightPosition(currentLimelightAngle);
+        }
+    }
+
+     */
 
     private void updateCenteringSpeedForAnamolies(
             double currentLimelightAngle
@@ -91,47 +143,19 @@ public class CenterToTarget extends Command {
         }
     }
 
-    private boolean isCurrentAngleBiggerThanCache(
-            double currentLimelightAngle
-    ) {
-        return currentLimelightAngle > cacheLimelightAngle;
+    private void updateSpeedForLeftPosition() {
+        logMessage("LEFT");
+        double newSpeed = calculateCenteringSpeedWithPid(cacheLimelightAngle);
+        setCenteringSpeed(newSpeed);
     }
 
-    private boolean isTargetDetected() {
-        return limelightSubsystem.isTargetDetected();
+    private void updateSpeedForRightPosition(double currentLimelightAngle) {
+        logMessage("RIGHT");
+        double newSpeed = calculateCenteringSpeedWithPid(currentLimelightAngle);
+        setCenteringSpeed(newSpeed);
+        setLimelightCacheWithNewAngle(currentLimelightAngle);
     }
 
-    private void setCenteringSpeed(
-            double centeringSpeed
-    ) {
-        this.centeringSpeed = centeringSpeed;
-    }
-
-    private double calculateCenteringSpeedWithPid(
-            double angle
-    ) {
-        return pidController.calculate(
-                angle
-        );
-    }
-
-    private void setLimelightCacheWithNewAngle(
-            double currentLimelightAngle
-    ) {
-        cacheLimelightAngle = currentLimelightAngle;
-    }
-
-    public CenteringStartPosition getStartingPosition() {
-        if (centeringSpeed < 0) {
-            return CenteringStartPosition.LEFT;
-        } else {
-            return CenteringStartPosition.RIGHT;
-        }
-    }
-
-    private double slowDownCenteringSpeed(double speedDivider) {
-        return centeringSpeed / speedDivider;
-    }
 
     @Override
     public void initialize() {
@@ -143,13 +167,14 @@ public class CenterToTarget extends Command {
     @Override
     public void execute() {
         if (isTargetDetected()) {
-            logMessage(String.valueOf(centeringSpeed));
+            logMessage("Centering Speed: " + String.valueOf(centeringSpeed));
 
             updateCenteringSpeedForAnamolies(
                     getCurrentLimelightAngle()
             );
 
             setCenteringSpeed(determineCenteringSpeedLowLimit());
+            logMessage("Centering Speed Low Limit: " + String.valueOf(determineCenteringSpeedLowLimit()));
 
             driveSubsystem.drive(
                     0,
@@ -184,7 +209,7 @@ public class CenterToTarget extends Command {
                 Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < HORIZONTAL_MAX_ERROR_ANGLE;
 
         if (isHorizontalTargetOffsetAngleErrorReached || !isTargetDetected()) {
-            System.out.println("CENTER end");
+            logMessage("CENTER end");
             return true;
         }
 
