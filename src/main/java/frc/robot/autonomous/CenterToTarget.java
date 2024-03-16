@@ -21,9 +21,7 @@ public class CenterToTarget extends Command {
     private final PIDController pidController;
     private final DriveSubsystem driveSubsystem = DriveSubsystem.getInstance();
     private double centeringSpeed;
-    private boolean isTargetDetected;
     private double cacheLimelightAngle;
-    private double currentLimelightAngle;
 
     public static CenterToTarget getInstance() {
         if (instance == null) {
@@ -52,13 +50,12 @@ public class CenterToTarget extends Command {
 
     @Override
     public void execute() {
-        currentLimelightAngle = limelightSubsystem.getHorizontalTargetOffsetAngle();
-        isTargetDetected = limelightSubsystem.isTargetDetected();
-
-        if (isTargetDetected) {
+        if (isTargetDetected()) {
             logMessage(String.valueOf(centeringSpeed));
 
-            updateCenteringSpeedForAnamolies();
+            updateCenteringSpeedForAnamolies(
+                    getCurrentLimelightAngle()
+            );
 
             setCenteringSpeedLowLimit();
 
@@ -76,19 +73,36 @@ public class CenterToTarget extends Command {
 
     }
 
-    private boolean isCurrentAngleBiggerThanCache(){
+    private double getCurrentLimelightAngle(){
+        return limelightSubsystem.getHorizontalTargetOffsetAngle();
+    }
+
+    private boolean isCurrentAngleBiggerThanCache(
+            double currentLimelightAngle
+    ){
         return currentLimelightAngle > cacheLimelightAngle;
     }
 
-    private void setCenteringSpeedWithPid(
+    private boolean isTargetDetected(){
+        return limelightSubsystem.isTargetDetected();
+    }
+    private void setCenteringSpeed(
+            double centeringSpeed
+    ) {
+        this.centeringSpeed = centeringSpeed;
+    }
+
+    private double calculateCenteringSpeedWithPid(
             double angle
     ) {
-        centeringSpeed = pidController.calculate(
+        return pidController.calculate(
                 angle
         );
     }
 
-    private void setLimelightCacheWithNewAngle() {
+    private void setLimelightCacheWithNewAngle(
+            double currentLimelightAngle
+    ) {
         cacheLimelightAngle = currentLimelightAngle;
     }
 
@@ -100,22 +114,28 @@ public class CenterToTarget extends Command {
         }
     }
 
-    private void updateCenteringSpeedForAnamolies() {
+    private void updateCenteringSpeedForAnamolies(
+            double currentLimelightAngle
+    ) {
         switch (getStartingPosition()) {
             case LEFT:
-                if (isCurrentAngleBiggerThanCache()) {
-                    setCenteringSpeedWithPid(cacheLimelightAngle);
+                if (isCurrentAngleBiggerThanCache(currentLimelightAngle)) {
+                    double newSpeed = calculateCenteringSpeedWithPid(cacheLimelightAngle);
+                    setCenteringSpeed(newSpeed);
                 } else {
-                    setCenteringSpeedWithPid(currentLimelightAngle);
-                    setLimelightCacheWithNewAngle();
+                    double newSpeed = calculateCenteringSpeedWithPid(currentLimelightAngle);
+                    setCenteringSpeed(newSpeed);
+                    setLimelightCacheWithNewAngle(currentLimelightAngle);
                 }
                 break;
             case RIGHT:
-                if (!isCurrentAngleBiggerThanCache()) {
-                    setCenteringSpeedWithPid(cacheLimelightAngle);
+                if (!isCurrentAngleBiggerThanCache(currentLimelightAngle)) {
+                    double newSpeed = calculateCenteringSpeedWithPid(cacheLimelightAngle);
+                    setCenteringSpeed(newSpeed);
                 } else {
-                    setCenteringSpeedWithPid(currentLimelightAngle);
-                    setLimelightCacheWithNewAngle();
+                    double newSpeed = calculateCenteringSpeedWithPid(currentLimelightAngle);
+                    setCenteringSpeed(newSpeed);
+                    setLimelightCacheWithNewAngle(currentLimelightAngle);
                 }
                 break;
         }
@@ -158,7 +178,7 @@ public class CenterToTarget extends Command {
         boolean isHorizontalTargetOffsetAngleErrorReached =
                 Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < HORIZONTAL_MAX_ERROR_ANGLE;
 
-        if (isHorizontalTargetOffsetAngleErrorReached || !isTargetDetected) {
+        if (isHorizontalTargetOffsetAngleErrorReached || !isTargetDetected()) {
             System.out.println("CENTER end");
             return true;
         }
