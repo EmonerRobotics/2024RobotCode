@@ -35,8 +35,8 @@ public final class Constants {
         public static final double setIntakeMotorSpeed = 0.5;
         public static final double setReverseIntakeMotorSpeed = -0.5;
 
-        public static final int intakeMotorPWM = 1;
-        public static final int intake1MotorPWM = 2;
+        public static final int intakeMotorPWM = 0;
+        public static final int intake1MotorPWM = 1;
     }
 
     public static final class JoystickConstants {
