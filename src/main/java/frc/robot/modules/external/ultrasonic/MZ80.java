@@ -14,7 +14,7 @@ public class MZ80 extends SubsystemBase {
     private final DigitalInput sensor;
 
     public MZ80() {
-        sensor = new DigitalInput(9);
+        sensor = new DigitalInput(7);
     }
 
     public static MZ80 getInstance() {

@@ -7,17 +7,23 @@ package frc.robot.modules.internal.arm.commands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.core.enums.PositionType;
 import frc.robot.modules.external.limelight.LimelightSubsystem;
+import frc.robot.modules.external.ultrasonic.MZ80;
 import frc.robot.modules.internal.arm.ArmSubsystem;
+import frc.robot.modules.internal.shooter.commands.ShooterSenderCommand;
 
 import java.util.Objects;
 
 import static frc.robot.core.utils.LoggingUtils.logEvent;
 import static frc.robot.core.utils.LoggingUtils.logMessage;
 
+
 public class ArmCommand extends Command {
     private static ArmCommand instance = null;
+
+    private ArmCommandCallback callback;
 
     private final ArmSubsystem armSubsystem = ArmSubsystem.getInstance();
     private final LimelightSubsystem limelightSubsystem = LimelightSubsystem.getInstance();
@@ -31,20 +37,24 @@ public class ArmCommand extends Command {
     }
 
     public static ArmCommand getInstance(
-            PositionType positionType
+            PositionType positionType,
+            ArmCommandCallback callback
     ) {
         if (instance == null) {
             instance = new ArmCommand();
         }
         instance.setPIDController(positionType);
+        instance.callback = callback;
         return instance;
     }
 
-    public static ArmCommand forceNewInstance(PositionType positionType) {
+    public static ArmCommand forceNewInstance(
+            PositionType positionType,
+            ArmCommandCallback callback
+    ) {
         instance = new ArmCommand();
         instance.setPIDController(positionType);
-        System.out.println("furkan 1");
-        logMessage("test test 1");
+        instance.callback = callback;
         return instance;
     }
 
@@ -81,21 +91,27 @@ public class ArmCommand extends Command {
         } else {
             pidController.setSetpoint(positionType.positionDegree);
         }
-        armSubsystem.manuelArmControl(-1 * positionType.speedMultiplier * armControlOutput);
 
+        armSubsystem.manuelArmControl(-1 * positionType.speedMultiplier * armControlOutput);
     }
 
     @Override
     public boolean isFinished() {
-        boolean commandShouldFinish = !armLocked;
+        boolean commandShouldFinish = !armLocked || !MZ80.getInstance().isSenorDistanceReached();
 
         double errorMargin = armSubsystem.getEncoderDegrees() - positionType.positionDegree;
 
 
         switch (positionType) {
             case TARGET:
-                errorMargin = armSubsystem.getEncoderDegrees() - limelightSubsystem.findShooterDegrees();
+                errorMargin = limelightSubsystem.findShooterDegrees() - armSubsystem.getEncoderDegrees();
                 SmartDashboard.putNumber("ARM SPEAKER ERROR: ", errorMargin);
+
+                if(errorMargin < 0.5){
+                    logMessage("ARM COMMAND SHOULD END");
+                    callback.shoot();
+                }
+
                 break;
             case AMPHI:
                 SmartDashboard.putNumber("ARM AMPHI ERROR", errorMargin);
@@ -109,14 +125,14 @@ public class ArmCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        logMessage("arm end");
-
+        logEvent();
         setArmLocked();
         logMessage("is arm locked in end: " + armLocked);
 
         if (positionType == PositionType.GROUND) {
             System.out.println("GROUND end");
-        } else {
+        }
+        else {
             armSubsystem.manuelArmControl(0);
         }
 

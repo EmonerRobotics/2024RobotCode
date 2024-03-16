@@ -13,7 +13,7 @@ public class ArmLockSubsystem extends SubsystemBase {
     private PWMVictorSPX armLockMotor;
 
     public ArmLockSubsystem() {
-        armLockMotor = new PWMVictorSPX(0);
+        armLockMotor = new PWMVictorSPX(2);
     }
 
     public static ArmLockSubsystem getInstance() {

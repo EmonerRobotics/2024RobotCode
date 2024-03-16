@@ -1,22 +1,36 @@
 package frc.robot.autonomous;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.core.enums.PositionType;
 import frc.robot.modules.internal.arm.commands.ArmCommand;
+import frc.robot.modules.internal.arm.commands.ArmCommandCallback;
 import frc.robot.modules.internal.shooter.commands.ShooterSenderCommand;
+
+import static frc.robot.core.utils.LoggingUtils.logMessage;
 
 public class FireCommand {
     public Command fireCommand() {
-        return new SequentialCommandGroup(
+        ArmCommandCallback callback = new ArmCommandCallback() {
+            @Override
+            public void shoot() {
+                logMessage("Shooting*********************************");
+                logMessage("Shooting*********************************");
+                logMessage("Shooting*********************************");
+                CommandScheduler.getInstance().schedule(ShooterSenderCommand.getInstance());
+            }
+        };
+
+        return
                 new ParallelCommandGroup(
                         new CenterToTarget(),
-                        ArmCommand.forceNewInstance(PositionType.TARGET)
-                ),
-                ShooterSenderCommand.forceNewInstance()
-                //ArmCommand.forceNewInstance(PositionType.GROUND)
-        );
+                        ArmCommand.forceNewInstance(
+                                PositionType.TARGET,
+                                callback
+                        )
+                );
+        // ShooterSenderCommand.forceNewInstance()
+        //ArmCommand.forceNewInstance(PositionType.GROUND)
+
 
     }
 }

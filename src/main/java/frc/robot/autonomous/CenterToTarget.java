@@ -6,13 +6,14 @@ import frc.robot.autonomous.enums.CenteringStartPosition;
 import frc.robot.modules.internal.drivetrain.DriveSubsystem;
 import frc.robot.modules.external.limelight.LimelightSubsystem;
 
+import static frc.robot.core.utils.LoggingUtils.logEvent;
 import static frc.robot.core.utils.LoggingUtils.logMessage;
 
 public class CenterToTarget extends Command {
 
     public static CenterToTarget instance = null;
 
-    public static final double HORIZONTAL_MAX_ERROR_ANGLE = 1.4;
+    public static final double HORIZONTAL_MAX_ERROR_ANGLE = 0.9;
     public static final double MINIMUM_SPEED_THRESHOLD = 0.045;
     public static final double MINIMUM_SPEED = 0.06;
     public static final double SPEED_DIVIDER = 3.2;
@@ -60,7 +61,6 @@ public class CenterToTarget extends Command {
     }
 
     private void setLimelightCacheWithNewAngle(double currentLimelightAngle) {
-        logMessage("CACHE set");
         cacheLimelightAngle = currentLimelightAngle;
     }
 
@@ -87,10 +87,8 @@ public class CenterToTarget extends Command {
                 }
             case RIGHT:
                 if (centeringSpeed < MINIMUM_SPEED_THRESHOLD) {
-                  //  logMessage("set minimum speed");
                     return MINIMUM_SPEED;
                 } else {
-                   // logMessage("divide speed");
                     return slowDownCenteringSpeed(SPEED_DIVIDER);
                 }
             default:
@@ -99,22 +97,8 @@ public class CenterToTarget extends Command {
     }
 
     private void setCenteringSpeed(double centeringSpeed) {
-        logMessage("set centering speed" + String.valueOf(centeringSpeed));
         this.centeringSpeed = centeringSpeed;
     }
-
-    /*
-    private void updateCenteringSpeedForAnamolies(
-            double currentLimelightAngle
-    ) {
-        if (isCurrentAngleBiggerThanCache(currentLimelightAngle)) {
-            updateSpeedForLeftPosition();
-        } else {
-            updateSpeedForRightPosition(currentLimelightAngle);
-        }
-    }
-
-     */
 
     private void updateCenteringSpeedForAnamolies(
             double currentLimelightAngle
@@ -145,22 +129,18 @@ public class CenterToTarget extends Command {
 
     @Override
     public void initialize() {
-        System.out.println("CENTER BASLADI");
+        logEvent();
         cacheLimelightAngle = limelightSubsystem.getHorizontalTargetOffsetAngle();
-        logMessage(String.valueOf(cacheLimelightAngle));
     }
 
     @Override
     public void execute() {
         if (isTargetDetected()) {
-            logMessage("Centering Speed: " + String.valueOf(centeringSpeed));
-
             updateCenteringSpeedForAnamolies(
                     getCurrentLimelightAngle()
             );
 
             setCenteringSpeed(determineCenteringSpeedLowLimit());
-            logMessage("Centering Speed Low Limit: " + String.valueOf(determineCenteringSpeedLowLimit()));
 
             driveSubsystem.drive(
                     0,
@@ -172,12 +152,22 @@ public class CenterToTarget extends Command {
 
         } else {
             logMessage("NO TARGET: " + cacheLimelightAngle);
+
+            driveSubsystem.drive(
+                    0,
+                    0,
+                    centeringSpeed,
+                    true,
+                    false
+            );
+
         }
 
     }
 
     @Override
     public void end(boolean interrupted) {
+        logEvent();
         driveSubsystem.drive(
                 0,
                 0,
@@ -186,7 +176,6 @@ public class CenterToTarget extends Command {
                 false
 
         );
-
     }
 
     @Override
@@ -194,8 +183,12 @@ public class CenterToTarget extends Command {
         boolean isHorizontalTargetOffsetAngleErrorReached =
                 Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()) < HORIZONTAL_MAX_ERROR_ANGLE;
 
-        if (isHorizontalTargetOffsetAngleErrorReached || !isTargetDetected()) {
-            logMessage("CENTER end");
+        if(!isTargetDetected()){
+            logMessage("CENTER END: target NOT detected");
+           // return true;
+        }
+        if (isHorizontalTargetOffsetAngleErrorReached) {
+            logMessage("CENTER END: target REACHED: " + Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()));
             return true;
         }
 

@@ -35,7 +35,7 @@ public class PathPlanner {
         //NamedCommands.registerCommand("fire", new FireCommand());
         NamedCommands.registerCommand("shooter", ShooterCommand.getInstance());
         // NamedCommands.registerCommand("slowArm", ArmCommand.getInstance(PositionType.TARGET));
-        NamedCommands.registerCommand("sender", ShooterSenderCommand.getInstance());
+      //  NamedCommands.registerCommand("sender", ShooterSenderCommand.getInstance());
         //NamedCommands.registerCommand("autoArm", ArmCommand.getInstance(PositionType.AUTO));
         //NamedCommands.registerCommand("zeroArm", ArmCommand.getInstance(PositionType.GROUND));
     }

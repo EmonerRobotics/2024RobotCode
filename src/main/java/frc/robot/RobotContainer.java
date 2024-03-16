@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.autonomous.CenterToTarget;
+import frc.robot.autonomous.FireCommand;
 import frc.robot.core.Constants;
 import frc.robot.core.Robot;
 import frc.robot.core.enums.PositionType;
@@ -69,8 +70,8 @@ public class RobotContainer {
                 upSystemJoystick,
                 2
         ).onTrue(
-               // new FireCommand().fireCommand()
-                CenterToTarget.getInstance()
+                new FireCommand().fireCommand()
+               // CenterToTarget.getInstance()
         );
 
         new JoystickButton(
@@ -84,7 +85,10 @@ public class RobotContainer {
                 upSystemJoystick,
                 4
         ).toggleOnTrue(
-                ArmCommand.forceNewInstance(PositionType.AMPHI)
+                ArmCommand.forceNewInstance(
+                        PositionType.AMPHI,
+                        () -> logMessage("Shooting EMPTY")
+                )
         );
 
         new JoystickButton(
@@ -142,10 +146,16 @@ public class RobotContainer {
         return new ParallelCommandGroup(
                 ShooterCommand.getInstance(),
                 new SequentialCommandGroup(
-                        ArmCommand.getInstance(PositionType.TARGET),
+                        ArmCommand.getInstance(
+                                PositionType.TARGET,
+                                () -> logMessage("Shooting EMPTY")
+                        ),
                         new WaitCommand(0.3),
                         new ShooterSenderCommand(),
-                        ArmCommand.getInstance(PositionType.GROUND)
+                        ArmCommand.getInstance(
+                                PositionType.GROUND,
+                                () -> logMessage("Shooting EMPTY")
+                        )
                 )
         );
 
