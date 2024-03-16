@@ -41,22 +41,22 @@ public class CenterToTarget extends Command {
         addRequirements(limelightSubsystem);
     }
 
-    private void setCenteringSpeedLowLimit() {
+    private double determineCenteringSpeedLowLimit() {
         switch (getStartingPosition()) {
             case LEFT:
                 if (centeringSpeed > -MINIMUM_SPEED_THRESHOLD) {
-                    setCenteringSpeed(-MINIMUM_SPEED);
+                    return -MINIMUM_SPEED;
                 } else {
-                    setCenteringSpeed(slowDownCenteringSpeed(SPEED_DIVIDER));
+                    return slowDownCenteringSpeed(SPEED_DIVIDER);
                 }
-                break;
             case RIGHT:
                 if (centeringSpeed < MINIMUM_SPEED_THRESHOLD) {
-                    setCenteringSpeed(MINIMUM_SPEED);
+                    return MINIMUM_SPEED;
                 } else {
-                    setCenteringSpeed(slowDownCenteringSpeed(SPEED_DIVIDER));
+                    return slowDownCenteringSpeed(SPEED_DIVIDER);
                 }
-                break;
+            default:
+                return 0;
         }
     }
 
@@ -149,7 +149,7 @@ public class CenterToTarget extends Command {
                     getCurrentLimelightAngle()
             );
 
-            setCenteringSpeedLowLimit();
+            setCenteringSpeed(determineCenteringSpeedLowLimit());
 
             driveSubsystem.drive(
                     0,
