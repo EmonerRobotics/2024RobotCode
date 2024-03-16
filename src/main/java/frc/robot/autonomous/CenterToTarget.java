@@ -32,7 +32,6 @@ public class CenterToTarget extends Command {
                 0.0,
                 0.0
         );
-        //  pidController.setIZone(0.01);
         pidController.setSetpoint(0);
 
         addRequirements(limelightSubsystem);
@@ -41,7 +40,8 @@ public class CenterToTarget extends Command {
     @Override
     public void initialize() {
         System.out.println("CENTER BASLADI");
-        cacheLimelightAngle = limelightSubsystem.getEstimatedDistance();
+        cacheLimelightAngle = limelightSubsystem.getHorizontalTargetOffsetAngle();
+        logMessage(String.valueOf(cacheLimelightAngle));
     }
 
     @Override
@@ -68,22 +68,12 @@ public class CenterToTarget extends Command {
                 }
             }
             else {
-                logMessage("sagdan");
-
-                logMessage("currentLimelightAngle: " + currentLimelightAngle);
-                logMessage("cacheLimelightAngle: " + cacheLimelightAngle);
-                logMessage("is current bigger than cache: " + String.valueOf(currentLimelightAngle > cacheLimelightAngle));
-
                 if(currentLimelightAngle < cacheLimelightAngle){
-                    logMessage("current bigger than cache: " + String.valueOf(currentLimelightAngle > cacheLimelightAngle));
-
                     centeringSpeed = pidController.calculate(
                             cacheLimelightAngle
                     );
                 }
                 else {
-                    logMessage("cache bigger than current: " + String.valueOf(currentLimelightAngle > cacheLimelightAngle));
-
                     centeringSpeed = pidController.calculate(
                             currentLimelightAngle
                     );
@@ -117,7 +107,6 @@ public class CenterToTarget extends Command {
                     true,
                     false
             );
-
 
         } else {
             logMessage("else situ: " + cacheLimelightAngle);
