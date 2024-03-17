@@ -1,11 +1,17 @@
 package frc.robot.modules.internal.drivetrain;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.core.Constants;
@@ -70,7 +76,14 @@ public class DriveSubsystem extends SubsystemBase {
      * Creates a new DriveSubsystem.
      */
     public DriveSubsystem() {
+
     }
+
+    public Rotation2d getAngle(){
+        return m_gyro.getRotation2d();
+    }
+
+
 
     @Override
     public void periodic() {
@@ -196,6 +209,23 @@ public class DriveSubsystem extends SubsystemBase {
         m_rearRight.setDesiredState(swerveModuleStates[3]);
     }
 
+    //Return chasis speed for PathPlanner
+    public ChassisSpeeds getChasisSpeed(){
+        return Constants.DriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(
+                m_frontLeft.getState(),
+                m_rearRight.getState(),
+                m_rearLeft.getState(),
+                m_rearRight.getState()
+        );
+    }
+
+    public void drive(ChassisSpeeds speeds){
+        SwerveModuleState[] swerveModuleStates = Constants.DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(speeds);
+        setModuleStates(swerveModuleStates);
+    }
+
+
+
     /**
      * Sets the wheels into an X formation to prevent movement.
      */
@@ -264,5 +294,34 @@ public class DriveSubsystem extends SubsystemBase {
     public double getTurnRate() {
         return m_gyro.getRate() * (Constants.DriveConstants.kGyroReversed ? -1.0 : 1.0);
     }
+
+    public void BuilderConfigure(){
+        AutoBuilder.configureHolonomic(
+                this::getPose,
+                this::resetOdometry,
+                this::getChasisSpeed,
+                this::drive,
+                new HolonomicPathFollowerConfig(
+                        new PIDConstants(Constants.ModuleConstants.kDrivingP, Constants.ModuleConstants.kDrivingI, Constants.ModuleConstants.kDrivingD),
+                        new PIDConstants(Constants.ModuleConstants.kTurningP, Constants.ModuleConstants.kTurningI, Constants.ModuleConstants.kTurningD),
+                        Constants.DriveConstants.kMaxSpeedMetersPerSecond,
+                        0.49,
+                        new ReplanningConfig(false,false)
+                ),
+                () -> {
+                    var alliance = DriverStation.getAlliance();
+                        if(alliance.isPresent()){
+                            return alliance.get() == DriverStation.Alliance.Red;
+                        }
+                        return false;
+                },
+                this
+        );
+    }
 }
+
+
+
+
+
 
