@@ -25,9 +25,6 @@ import frc.robot.modules.internal.intake.commands.IntakeCommand;
 import frc.robot.modules.internal.shooter.commands.ShooterCommand;
 import frc.robot.modules.internal.shooter.commands.ShooterSenderCommand;
 
-import static frc.robot.core.utils.LoggingUtils.logEvent;
-import static frc.robot.core.utils.LoggingUtils.logMessage;
-
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -70,8 +67,8 @@ public class RobotContainer {
                 upSystemJoystick,
                 2
         ).onTrue(
-                //new FireCommand().fireCommand()
-               CenterToTarget.getInstance()
+                new FireCommand().fireCommand()
+                //CenterToTarget.getInstance()
         );
 
         new JoystickButton(
@@ -87,7 +84,7 @@ public class RobotContainer {
         ).toggleOnTrue(
                 ArmCommand.forceNewInstance(
                         PositionType.AMPHI,
-                        () -> logMessage("Shooting EMPTY")
+                        () -> System.out.println("-*")
                 )
         );
 
@@ -148,13 +145,13 @@ public class RobotContainer {
                 new SequentialCommandGroup(
                         ArmCommand.getInstance(
                                 PositionType.TARGET,
-                                () -> logMessage("Shooting EMPTY")
+                                () -> System.out.println("Shooting EMPTY")
                         ),
                         new WaitCommand(0.3),
                         new ShooterSenderCommand(),
                         ArmCommand.getInstance(
                                 PositionType.GROUND,
-                                () -> logMessage("Shooting EMPTY")
+                                () -> System.out.println("--")
                         )
                 )
         );

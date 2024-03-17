@@ -9,9 +9,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.modules.external.ultrasonic.MZ80;
 import frc.robot.modules.internal.intake.IntakeSubsystem;
 
-import static frc.robot.core.utils.LoggingUtils.logEvent;
-import static frc.robot.core.utils.LoggingUtils.logMessage;
-
 public class ShooterSenderCommand extends Command {
 
     private static ShooterSenderCommand instance = null;
@@ -37,7 +34,7 @@ public class ShooterSenderCommand extends Command {
 
     @Override
     public void initialize() {
-        logEvent();
+
     }
 
     @Override
@@ -47,7 +44,7 @@ public class ShooterSenderCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        logEvent();
+
         intakeSubsystem.setMotor(false);
     }
 

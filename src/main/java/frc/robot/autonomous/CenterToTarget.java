@@ -7,9 +7,6 @@ import frc.robot.autonomous.enums.CenteringStartPosition;
 import frc.robot.modules.internal.drivetrain.DriveSubsystem;
 import frc.robot.modules.external.limelight.LimelightSubsystem;
 
-import static frc.robot.core.utils.LoggingUtils.logEvent;
-import static frc.robot.core.utils.LoggingUtils.logMessage;
-
 public class CenterToTarget extends Command {
 
     public static CenterToTarget instance = null;
@@ -49,7 +46,7 @@ public class CenterToTarget extends Command {
 
     private void setCenteringSpeed(double centeringSpeed) {
         SmartDashboard.putNumber("CENTERING_SPEED", centeringSpeed);
-        logMessage("CENTERING_SPEED_ " + centeringSpeed);
+//        logMessage("CENTERING_SPEED_ " + centeringSpeed);
         this.centeringSpeed = centeringSpeed;
     }
 
@@ -91,13 +88,13 @@ public class CenterToTarget extends Command {
         switch (getStartingPosition()) {
             case LEFT:
                 if (centeringSpeed > -MINIMUM_SPEED_THRESHOLD) {
-                    logMessage("LEFT MINIMUM");
+                  //  logMessage("LEFT MINIMUM");
                     return -MINIMUM_SPEED;
                 }
                 break;
             case RIGHT:
                 if (centeringSpeed < MINIMUM_SPEED_THRESHOLD) {
-                    logMessage("RIGHT MINIMUM");
+                  //  logMessage("RIGHT MINIMUM");
                     return MINIMUM_SPEED;
                 }
                 break;
@@ -114,20 +111,20 @@ public class CenterToTarget extends Command {
         double newSpeed;
         switch (getStartingPosition()) {
             case LEFT:
-                logMessage("LEFT ANOMALIES");
+               // logMessage("LEFT ANOMALIES");
                 if (!isAnomalyDetectedForLeft(currentLimelightAngle)) {
                     newSpeed = calculateCenteringSpeedWithPid(currentLimelightAngle);
                     setCenteringSpeed(newSpeed);
-                    logMessage("selam 1");
+               //     logMessage("selam 1");
                     setLimelightCacheWithNewAngle(currentLimelightAngle);
                 } else {
-                    logMessage("selam 2");
+               //     logMessage("selam 2");
                     newSpeed = calculateCenteringSpeedWithPid(cacheLimelightAngle);
                     setCenteringSpeed(newSpeed);
                 }
                 break;
             case RIGHT:
-                logMessage("RIGHT ANOMALIES");
+             //   logMessage("RIGHT ANOMALIES");
                 if (!isAnomalyDetectedForRight(currentLimelightAngle)) {
                     newSpeed = calculateCenteringSpeedWithPid(currentLimelightAngle);
                     setCenteringSpeed(newSpeed);
@@ -143,12 +140,11 @@ public class CenterToTarget extends Command {
 
     @Override
     public void initialize() {
-        logEvent();
         cacheLimelightAngle = limelightSubsystem.getHorizontalTargetOffsetAngle();
         double calcres = calculateCenteringSpeedWithPid(cacheLimelightAngle);
         setCenteringSpeed(calcres);
-        logMessage("initialized:" + cacheLimelightAngle);
-        logMessage("initialized:" + calcres);
+       // logMessage("initialized:" + cacheLimelightAngle);
+       // logMessage("initialized:" + calcres);
     }
 
     @Override
@@ -176,7 +172,7 @@ public class CenterToTarget extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        logEvent();
+
         driveSubsystem.drive(
                 0,
                 0,
@@ -200,9 +196,9 @@ public class CenterToTarget extends Command {
             long timeSinceLastDetection = currentTime - lastDetectionTime;
 
             if (timeSinceLastDetection >= 2000) {
-                logMessage("target NOT detected for 2 seconds.");
-                logMessage("centering speed: " + centeringSpeed);
-                logMessage("cached angle: " + cacheLimelightAngle);
+               // logMessage("target NOT detected for 2 seconds.");
+              //  logMessage("centering speed: " + centeringSpeed);
+              //  logMessage("cached angle: " + cacheLimelightAngle);
                 return true;
             }
         } else {
@@ -210,7 +206,7 @@ public class CenterToTarget extends Command {
         }
 
         if (isHorizontalTargetOffsetAngleErrorReached && isTargetDetected()) {
-            logMessage("target REACHED: " + Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()));
+          //  logMessage("target REACHED: " + Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()));
             return true;
         }
 

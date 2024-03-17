@@ -1,7 +1,7 @@
 package frc.robot.core.enums;
 
 public enum PositionType {
-    TARGET(-1, 1, 1.5),
+    TARGET(-1, 0.55, 1.5),
     AMPHI(45, 0.5, 1),
     AUTO(14.5, 0.5, 1.5),
     GROUND(1.5, 1, 1.5);

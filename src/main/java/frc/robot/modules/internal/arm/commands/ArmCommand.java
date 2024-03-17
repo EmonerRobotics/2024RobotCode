@@ -12,13 +12,8 @@ import frc.robot.core.enums.PositionType;
 import frc.robot.modules.external.limelight.LimelightSubsystem;
 import frc.robot.modules.external.ultrasonic.MZ80;
 import frc.robot.modules.internal.arm.ArmSubsystem;
-import frc.robot.modules.internal.shooter.commands.ShooterSenderCommand;
 
 import java.util.Objects;
-
-import static frc.robot.core.utils.LoggingUtils.logEvent;
-import static frc.robot.core.utils.LoggingUtils.logMessage;
-
 
 public class ArmCommand extends Command {
     private static ArmCommand instance = null;
@@ -75,15 +70,13 @@ public class ArmCommand extends Command {
 
     @Override
     public void initialize() {
-        logMessage("arm initialize");
+       // logMessage("arm initialize");
         setArmLocked();
-        logMessage("isArmLocked: " + armLocked);
         pidController.reset();
     }
 
     @Override
     public void execute() {
-        logMessage("arm execute");
         double armControlOutput = pidController.calculate(armSubsystem.getEncoderDegrees());
 
         if (positionType == PositionType.TARGET) {
@@ -91,6 +84,7 @@ public class ArmCommand extends Command {
         } else {
             pidController.setSetpoint(positionType.positionDegree);
         }
+
 
         armSubsystem.manuelArmControl(-1 * positionType.speedMultiplier * armControlOutput);
     }
@@ -108,14 +102,13 @@ public class ArmCommand extends Command {
                 SmartDashboard.putNumber("ARM SPEAKER ERROR: ", errorMargin);
 
                 if(errorMargin < 0.5){
-                    logMessage("ARM COMMAND SHOULD END");
+                   // logMessage("ARM COMMAND SHOULD END");
                     callback.shoot();
                 }
 
                 break;
             case AMPHI:
                 SmartDashboard.putNumber("ARM AMPHI ERROR", errorMargin);
-
                 break;
 
         }
@@ -125,14 +118,14 @@ public class ArmCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        logEvent();
+
         setArmLocked();
-        logMessage("is arm locked in end: " + armLocked);
 
         if (positionType == PositionType.GROUND) {
             System.out.println("GROUND end");
         }
         else {
+            System.out.println("END");
             armSubsystem.manuelArmControl(0);
         }
 
