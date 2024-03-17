@@ -219,7 +219,7 @@ public class DriveSubsystem extends SubsystemBase {
         );
     }
 
-    public void drive(ChassisSpeeds speeds){
+    public void drivePath(ChassisSpeeds speeds){
         SwerveModuleState[] swerveModuleStates = Constants.DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(speeds);
         setModuleStates(swerveModuleStates);
     }
@@ -300,7 +300,7 @@ public class DriveSubsystem extends SubsystemBase {
                 this::getPose,
                 this::resetOdometry,
                 this::getChasisSpeed,
-                this::drive,
+                this::drivePath,
                 new HolonomicPathFollowerConfig(
                         new PIDConstants(Constants.ModuleConstants.kDrivingP, Constants.ModuleConstants.kDrivingI, Constants.ModuleConstants.kDrivingD),
                         new PIDConstants(Constants.ModuleConstants.kTurningP, Constants.ModuleConstants.kTurningI, Constants.ModuleConstants.kTurningD),

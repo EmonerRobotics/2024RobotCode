@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -141,7 +143,7 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-
+        //return new PathPlannerAuto("autoTest1");
         ArmCommandCallback armCommandCallback = new ArmCommandCallback() {
             @Override
             public void shoot() {
