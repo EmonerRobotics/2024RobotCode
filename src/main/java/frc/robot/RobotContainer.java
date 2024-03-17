@@ -70,8 +70,8 @@ public class RobotContainer {
                 upSystemJoystick,
                 2
         ).onTrue(
-                new FireCommand().fireCommand()
-               // CenterToTarget.getInstance()
+                //new FireCommand().fireCommand()
+               CenterToTarget.getInstance()
         );
 
         new JoystickButton(

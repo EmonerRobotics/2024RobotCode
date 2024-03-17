@@ -10,7 +10,7 @@ import static frc.robot.core.utils.LoggingUtils.logMessage;
 
 public class FireCommand {
     public Command fireCommand() {
-        ArmCommandCallback callback = new ArmCommandCallback() {
+        ArmCommandCallback armCommandCallback = new ArmCommandCallback() {
             @Override
             public void shoot() {
                 logMessage("Shooting*********************************");
@@ -25,7 +25,7 @@ public class FireCommand {
                         new CenterToTarget(),
                         ArmCommand.forceNewInstance(
                                 PositionType.TARGET,
-                                callback
+                                armCommandCallback
                         )
                 );
         // ShooterSenderCommand.forceNewInstance()

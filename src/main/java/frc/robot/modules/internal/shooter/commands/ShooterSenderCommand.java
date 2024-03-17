@@ -31,26 +31,22 @@ public class ShooterSenderCommand extends Command {
     }
 
     public static ShooterSenderCommand forceNewInstance() {
-        logMessage("*********************NEW INSTANCE***************************************");
         instance = new ShooterSenderCommand();
         return instance;
     }
 
     @Override
     public void initialize() {
-        logMessage("********************** INIT **************************************");
         logEvent();
     }
 
     @Override
     public void execute() {
-        logMessage("********************** EXEC **************************************");
         intakeSubsystem.setMotor(true);
     }
 
     @Override
     public void end(boolean interrupted) {
-        logMessage("********************** END **************************************");
         logEvent();
         intakeSubsystem.setMotor(false);
     }
