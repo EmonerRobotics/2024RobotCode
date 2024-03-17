@@ -1,6 +1,7 @@
 package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.autonomous.enums.CenteringStartPosition;
 import frc.robot.modules.internal.drivetrain.DriveSubsystem;
@@ -15,7 +16,7 @@ public class CenterToTarget extends Command {
 
     public static final double HORIZONTAL_MAX_ERROR_ANGLE = 0.9;
     public static final double MINIMUM_SPEED_THRESHOLD = 0.045;
-    public static final double MINIMUM_SPEED = 0.06;
+    public static final double MINIMUM_SPEED = 0.05;
     public static final double SPEED_DIVIDER = 3.2;
 
     private final LimelightSubsystem limelightSubsystem = LimelightSubsystem.getInstance();
@@ -47,6 +48,8 @@ public class CenterToTarget extends Command {
     }
 
     private void setCenteringSpeed(double centeringSpeed) {
+        SmartDashboard.putNumber("CENTERING_SPEED", centeringSpeed);
+        logMessage("CENTERING_SPEED_ " + centeringSpeed);
         this.centeringSpeed = centeringSpeed;
     }
 
@@ -80,7 +83,6 @@ public class CenterToTarget extends Command {
         }
     }
 
-
     private double slowDownCenteringSpeed(double speedDivider) {
         return centeringSpeed / speedDivider;
     }
@@ -89,16 +91,19 @@ public class CenterToTarget extends Command {
         switch (getStartingPosition()) {
             case LEFT:
                 if (centeringSpeed > -MINIMUM_SPEED_THRESHOLD) {
+                    logMessage("LEFT MINIMUM");
                     return -MINIMUM_SPEED;
                 }
-
+                break;
             case RIGHT:
                 if (centeringSpeed < MINIMUM_SPEED_THRESHOLD) {
+                    logMessage("RIGHT MINIMUM");
                     return MINIMUM_SPEED;
                 }
-            default:
-                return centeringSpeed;
+                break;
         }
+
+        return centeringSpeed;
 
 
     }
@@ -109,20 +114,25 @@ public class CenterToTarget extends Command {
         double newSpeed;
         switch (getStartingPosition()) {
             case LEFT:
+                logMessage("LEFT ANOMALIES");
                 if (!isAnomalyDetectedForLeft(currentLimelightAngle)) {
                     newSpeed = calculateCenteringSpeedWithPid(currentLimelightAngle);
                     setCenteringSpeed(newSpeed);
+                    logMessage("selam 1");
                     setLimelightCacheWithNewAngle(currentLimelightAngle);
                 } else {
+                    logMessage("selam 2");
                     newSpeed = calculateCenteringSpeedWithPid(cacheLimelightAngle);
                     setCenteringSpeed(newSpeed);
                 }
                 break;
             case RIGHT:
+                logMessage("RIGHT ANOMALIES");
                 if (!isAnomalyDetectedForRight(currentLimelightAngle)) {
                     newSpeed = calculateCenteringSpeedWithPid(currentLimelightAngle);
                     setCenteringSpeed(newSpeed);
                     setLimelightCacheWithNewAngle(currentLimelightAngle);
+
                 } else {
                     newSpeed = calculateCenteringSpeedWithPid(cacheLimelightAngle);
                     setCenteringSpeed(newSpeed);
@@ -135,6 +145,10 @@ public class CenterToTarget extends Command {
     public void initialize() {
         logEvent();
         cacheLimelightAngle = limelightSubsystem.getHorizontalTargetOffsetAngle();
+        double calcres = calculateCenteringSpeedWithPid(cacheLimelightAngle);
+        setCenteringSpeed(calcres);
+        logMessage("initialized:" + cacheLimelightAngle);
+        logMessage("initialized:" + calcres);
     }
 
     @Override
@@ -195,7 +209,7 @@ public class CenterToTarget extends Command {
             lastDetectionTime = System.currentTimeMillis();
         }
 
-        if (isHorizontalTargetOffsetAngleErrorReached) {
+        if (isHorizontalTargetOffsetAngleErrorReached && isTargetDetected()) {
             logMessage("target REACHED: " + Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()));
             return true;
         }
