@@ -136,27 +136,17 @@ public class ArmCommand extends Command {
 
             case GROUND:
                 errorMargin = Math.abs(armSubsystem.getEncoderDegrees() - positionType.positionDegree);
-                SmartDashboard.putNumber("ARM() getEncoderDegrees: ", armSubsystem.getEncoderDegrees());
-                SmartDashboard.putNumber("ARM() positionDegree: ", positionType.positionDegree);
-                SmartDashboard.putNumber("ARM() errorMargin: ", errorMargin);
+
                 if (errorMargin <= positionType.threasold) {
-                    logMessage("furkan0");
                     if (isFirstAttemptToShoot) {
-                        logMessage("furkan1");
                         isFirstAttemptToShoot = false;
                         callback.shoot();
                         return true;
                     }
-                    else{
-                        logMessage("furkan3");
-                    }
 
                 }
-                else{
-                    logMessage("furkan4");
-                    return false;
-                }
 
+                break;
             default:
                 return true;
 
