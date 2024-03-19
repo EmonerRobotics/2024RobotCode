@@ -96,17 +96,21 @@ public class ArmCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        boolean commandShouldFinish = !MZ80.getInstance().isSenorDistanceReached();
+        boolean targetCommandShouldFinish = false;
+        boolean amphiCommandShouldFinish = false;
 
-        double errorMargin = armSubsystem.getEncoderDegrees() - positionType.positionDegree;
-
+        double errorMargin;
 
         switch (positionType) {
             case TARGET:
-                errorMargin = limelightSubsystem.findShooterDegrees() - armSubsystem.getEncoderDegrees();
-                SmartDashboard.putNumber("ARM SPEAKER ERROR: ", errorMargin);
+                targetCommandShouldFinish = !MZ80.getInstance().isSenorDistanceReached();
 
-                if(errorMargin <= 0.4){
+                errorMargin = limelightSubsystem.findShooterDegrees() - armSubsystem.getEncoderDegrees();
+                SmartDashboard.putNumber("ARM Shooter Degree: ", limelightSubsystem.findShooterDegrees());
+                SmartDashboard.putNumber("ARM Encoder Degree: ", armSubsystem.getEncoderDegrees());
+                SmartDashboard.putNumber("ARM(TARGET) Error Margin: ", errorMargin);
+
+                if(errorMargin <= positionType.threasold){
                     if(isFirstAttemptToShoot && !CenterToTarget.getInstance().getIsCenterToTargetActive()){
                         callback.shoot();
                         isFirstAttemptToShoot = false;
@@ -114,18 +118,26 @@ public class ArmCommand extends Command {
 
                 }
 
+                if(targetCommandShouldFinish){
+                    isFirstAttemptToShoot = true;
+                }
+
                 break;
             case AMPHI:
-                SmartDashboard.putNumber("ARM AMPHI ERROR", errorMargin);
+                errorMargin = Math.abs(armSubsystem.getEncoderDegrees() - positionType.positionDegree);
+                SmartDashboard.putNumber("ARM(AMPHI) Encoder Margin: ", armSubsystem.getEncoderDegrees());
+                SmartDashboard.putNumber("ARM(AMPHI) position Margin: ", positionType.positionDegree);
+                SmartDashboard.putNumber("ARM(AMPHI) Error Margin: ", errorMargin);
+                if(errorMargin <= positionType.threasold){
+                    amphiCommandShouldFinish = true;
+                }
                 break;
 
         }
 
-        if(commandShouldFinish){
-            isFirstAttemptToShoot = true;
-        }
 
-        return commandShouldFinish;
+
+        return targetCommandShouldFinish || amphiCommandShouldFinish;
     }
 
     @Override
