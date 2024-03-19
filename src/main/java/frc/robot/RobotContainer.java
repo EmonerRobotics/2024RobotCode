@@ -16,6 +16,7 @@ import frc.robot.core.Robot;
 import frc.robot.core.enums.PositionType;
 import frc.robot.modules.internal.arm.ArmSubsystem;
 import frc.robot.modules.internal.arm.commands.ArmCommand;
+import frc.robot.modules.internal.arm.commands.ArmCommandCallback;
 import frc.robot.modules.internal.arm.commands.ArmLockCommand;
 import frc.robot.modules.internal.arm.commands.ManuelArmCommand;
 import frc.robot.modules.internal.drivetrain.DriveSubsystem;
@@ -23,6 +24,8 @@ import frc.robot.modules.internal.intake.IntakeType;
 import frc.robot.modules.internal.intake.commands.IntakeCommand;
 import frc.robot.modules.internal.shooter.commands.ShooterCommand;
 import frc.robot.modules.internal.shooter.commands.ShooterSenderCommand;
+
+import static frc.robot.core.utils.LoggingUtils.logEvent;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -138,19 +141,20 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
+
+        ArmCommandCallback armCommandCallback = new ArmCommandCallback() {
+            @Override
+            public void shoot() {
+                logEvent();
+                CommandScheduler.getInstance().schedule(ShooterSenderCommand.forceNewInstance());
+            }
+        };
+
         return new ParallelCommandGroup(
                 ShooterCommand.getInstance(),
-                new SequentialCommandGroup(
-                        ArmCommand.getInstance(
-                                PositionType.TARGET,
-                                () -> System.out.println("Shooting EMPTY")
-                        ),
-                        new WaitCommand(0.3),
-                        new ShooterSenderCommand(),
-                        ArmCommand.getInstance(
-                                PositionType.GROUND,
-                                () -> System.out.println("--")
-                        )
+                ArmCommand.forceNewInstance(
+                        PositionType.GROUND,
+                        armCommandCallback
                 )
         );
 

@@ -7,7 +7,6 @@ package frc.robot.modules.internal.arm.commands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.autonomous.CenterToTarget;
 import frc.robot.core.enums.PositionType;
 import frc.robot.modules.external.limelight.LimelightSubsystem;
@@ -17,6 +16,7 @@ import frc.robot.modules.internal.arm.ArmSubsystem;
 import java.util.Objects;
 
 import static frc.robot.core.utils.LoggingUtils.logEvent;
+import static frc.robot.core.utils.LoggingUtils.logMessage;
 
 public class ArmCommand extends Command {
     private static ArmCommand instance = null;
@@ -59,7 +59,7 @@ public class ArmCommand extends Command {
         return instance;
     }
 
-    private void setArmLocked(boolean value){
+    private void setArmLocked(boolean value) {
         armLocked = value;
     }
 
@@ -85,7 +85,7 @@ public class ArmCommand extends Command {
     public void execute() {
         double armControlOutput = pidController.calculate(armSubsystem.getEncoderDegrees());
 
-        if(limelightSubsystem.isTargetDetected()){
+        if (limelightSubsystem.isTargetDetected()) {
             currentLimelightShooterDegree = limelightSubsystem.findShooterDegrees();
         }
 
@@ -114,34 +114,48 @@ public class ArmCommand extends Command {
 
                 errorMargin = currentLimelightShooterDegree - armSubsystem.getEncoderDegrees();
 
-                SmartDashboard.putNumber("ARM Shooter Degree: ", limelightSubsystem.findShooterDegrees());
-                SmartDashboard.putNumber("ARM Encoder Degree: ", armSubsystem.getEncoderDegrees());
-                SmartDashboard.putNumber("ARM(TARGET) Error Margin: ", errorMargin);
-                SmartDashboard.putBoolean("First Attempt: ", isFirstAttemptToShoot);
-                SmartDashboard.putBoolean("isCenterToTargetActive: ", CenterToTarget.getInstance().getIsCenterToTargetActive());
-
-                if(errorMargin <= positionType.threasold){
-                    if(isFirstAttemptToShoot && !CenterToTarget.getInstance().getIsCenterToTargetActive()){
+                if (errorMargin <= positionType.threasold) {
+                    if (isFirstAttemptToShoot && !CenterToTarget.getInstance().getIsCenterToTargetActive()) {
                         callback.shoot();
                         isFirstAttemptToShoot = false;
                     }
 
                 }
 
-                if(targetCommandShouldFinish){
+                if (targetCommandShouldFinish) {
                     isFirstAttemptToShoot = true;
                 }
 
                 break;
             case AMPHI:
                 errorMargin = Math.abs(armSubsystem.getEncoderDegrees() - positionType.positionDegree);
-                SmartDashboard.putNumber("ARM(AMPHI) Encoder Margin: ", armSubsystem.getEncoderDegrees());
-                SmartDashboard.putNumber("ARM(AMPHI) position Margin: ", positionType.positionDegree);
-                SmartDashboard.putNumber("ARM(AMPHI) Error Margin: ", errorMargin);
-                if(errorMargin <= positionType.threasold){
+                if (errorMargin <= positionType.threasold) {
                     amphiCommandShouldFinish = true;
                 }
                 break;
+
+            case GROUND:
+                errorMargin = Math.abs(armSubsystem.getEncoderDegrees() - positionType.positionDegree);
+                SmartDashboard.putNumber("ARM() getEncoderDegrees: ", armSubsystem.getEncoderDegrees());
+                SmartDashboard.putNumber("ARM() positionDegree: ", positionType.positionDegree);
+                SmartDashboard.putNumber("ARM() errorMargin: ", errorMargin);
+                if (errorMargin <= positionType.threasold) {
+                    logMessage("furkan0");
+                    if (isFirstAttemptToShoot) {
+                        logMessage("furkan1");
+                        isFirstAttemptToShoot = false;
+                        callback.shoot();
+                        return true;
+                    }
+                    else{
+                        logMessage("furkan3");
+                    }
+
+                }
+                else{
+                    logMessage("furkan4");
+                    return false;
+                }
 
             default:
                 return true;
@@ -157,11 +171,9 @@ public class ArmCommand extends Command {
         setArmLocked(false);
         isFirstAttemptToShoot = true;
 
-        if (positionType == PositionType.GROUND) {
-        }
-        else {
-            armSubsystem.manuelArmControl(0);
-        }
+
+        armSubsystem.manuelArmControl(0);
+
 
     }
 
