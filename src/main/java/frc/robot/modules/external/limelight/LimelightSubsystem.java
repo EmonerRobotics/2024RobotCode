@@ -44,7 +44,10 @@ public class LimelightSubsystem extends SubsystemBase {
     }
 
     public double findShooterDegrees() {
-        return (0.0095 * Math.pow(getVerticalTargetOffsetAngle(), 2) - 1.0182 * getVerticalTargetOffsetAngle() + 20.195);
+        if (isTargetDetected()) {
+            return 0.0095 * Math.pow(getVerticalTargetOffsetAngle(), 2) - 1.0182 * getVerticalTargetOffsetAngle() + 20.195;
+        }
+        return 2;
     }
 
     public double getTargetId() {

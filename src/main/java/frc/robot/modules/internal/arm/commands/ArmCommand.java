@@ -7,7 +7,6 @@ package frc.robot.modules.internal.arm.commands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.autonomous.CenterToTarget;
 import frc.robot.core.enums.PositionType;
 import frc.robot.modules.external.limelight.LimelightSubsystem;
@@ -20,12 +19,10 @@ import static frc.robot.core.utils.LoggingUtils.logEvent;
 
 public class ArmCommand extends Command {
     private static ArmCommand instance = null;
-
-    private ArmCommandCallback callback;
-
     private final ArmSubsystem armSubsystem = ArmSubsystem.getInstance();
     private final LimelightSubsystem limelightSubsystem = LimelightSubsystem.getInstance();
     private final PIDController pidController;
+    private ArmCommandCallback callback;
     private PositionType positionType;
     private boolean armLocked = false;
     private boolean isFirstAttemptToShoot = true;
@@ -58,7 +55,7 @@ public class ArmCommand extends Command {
         return instance;
     }
 
-    private void setArmLocked(boolean value){
+    private void setArmLocked(boolean value) {
         armLocked = value;
     }
 
@@ -110,15 +107,15 @@ public class ArmCommand extends Command {
                 SmartDashboard.putNumber("ARM Encoder Degree: ", armSubsystem.getEncoderDegrees());
                 SmartDashboard.putNumber("ARM(TARGET) Error Margin: ", errorMargin);
 
-                if(errorMargin <= positionType.threasold){
-                    if(isFirstAttemptToShoot && !CenterToTarget.getInstance().getIsCenterToTargetActive()){
+                if (errorMargin <= positionType.threasold) {
+                    if (isFirstAttemptToShoot && !CenterToTarget.getInstance().getIsCenterToTargetActive()) {
                         callback.shoot();
                         isFirstAttemptToShoot = false;
                     }
 
                 }
 
-                if(targetCommandShouldFinish){
+                if (targetCommandShouldFinish) {
                     isFirstAttemptToShoot = true;
                 }
 
@@ -128,27 +125,26 @@ public class ArmCommand extends Command {
                 SmartDashboard.putNumber("ARM(AMPHI) Encoder Margin: ", armSubsystem.getEncoderDegrees());
                 SmartDashboard.putNumber("ARM(AMPHI) position Margin: ", positionType.positionDegree);
                 SmartDashboard.putNumber("ARM(AMPHI) Error Margin: ", errorMargin);
-                if(errorMargin <= positionType.threasold){
+                if (errorMargin <= positionType.threasold) {
                     amphiCommandShouldFinish = true;
                 }
                 break;
 
+            default:
+                return true;
+
         }
-
-
 
         return targetCommandShouldFinish || amphiCommandShouldFinish;
     }
 
     @Override
     public void end(boolean interrupted) {
+        logEvent();
         setArmLocked(false);
 
         if (positionType == PositionType.GROUND) {
-            System.out.println("GROUND end");
-        }
-        else {
-            System.out.println("END");
+        } else {
             armSubsystem.manuelArmControl(0);
         }
 

@@ -2,7 +2,7 @@ package frc.robot.core.enums;
 
 public enum PositionType {
     TARGET(-1, 0.55, 0.4),
-    AMPHI(89, 0.55, 0.4),
+    AMPHI(88, 0.55, 0.4),
     AUTO(14.5, 0.5, 0.4),
     GROUND(1.5, 1, 0.4);
 
@@ -13,10 +13,10 @@ public enum PositionType {
     private PositionType(
             double positionDegree,
             double speedMultiplier,
-            double threasold
+            double threshold
     ) {
         this.positionDegree = positionDegree;
         this.speedMultiplier = speedMultiplier;
-        this.threasold = threasold;
+        this.threasold = threshold;
     }
 }

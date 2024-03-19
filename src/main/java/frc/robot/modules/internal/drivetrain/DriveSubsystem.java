@@ -14,47 +14,25 @@ import frc.robot.modules.internal.drivetrain.swerve.MAXSwerveModule;
 
 public class DriveSubsystem extends SubsystemBase {
     private static DriveSubsystem instance = null;
-
-    public static DriveSubsystem getInstance() {
-        if (instance == null) {
-            instance = new DriveSubsystem();
-        }
-        return instance;
-    }
-
     // Create MAXSwerveModules
     private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
             Constants.DriveConstants.kFrontLeftDrivingCanId,
             Constants.DriveConstants.kFrontLeftTurningCanId,
             Constants.DriveConstants.kFrontLeftChassisAngularOffset);
-
     private final MAXSwerveModule m_frontRight = new MAXSwerveModule(
             Constants.DriveConstants.kFrontRightDrivingCanId,
             Constants.DriveConstants.kFrontRightTurningCanId,
             Constants.DriveConstants.kFrontRightChassisAngularOffset);
-
     private final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
             Constants.DriveConstants.kRearLeftDrivingCanId,
             Constants.DriveConstants.kRearLeftTurningCanId,
             Constants.DriveConstants.kBackLeftChassisAngularOffset);
-
     private final MAXSwerveModule m_rearRight = new MAXSwerveModule(
             Constants.DriveConstants.kRearRightDrivingCanId,
             Constants.DriveConstants.kRearRightTurningCanId,
             Constants.DriveConstants.kBackRightChassisAngularOffset);
-
     // The gyro sensor
     private final AHRS m_gyro = new AHRS(SPI.Port.kMXP);
-
-    // Slew rate filter variables for controlling lateral acceleration
-    private double m_currentRotation = 0.0;
-    private double m_currentTranslationDir = 0.0;
-    private double m_currentTranslationMag = 0.0;
-
-    private SlewRateLimiter m_magLimiter = new SlewRateLimiter(Constants.DriveConstants.kMagnitudeSlewRate);
-    private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(Constants.DriveConstants.kRotationalSlewRate);
-    private double m_prevTime = WPIUtilJNI.now() * 1e-6;
-
     // Odometry class for tracking robot pose
     SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
             Constants.DriveConstants.kDriveKinematics,
@@ -65,11 +43,26 @@ public class DriveSubsystem extends SubsystemBase {
                     m_rearLeft.getPosition(),
                     m_rearRight.getPosition()
             });
+    // Slew rate filter variables for controlling lateral acceleration
+    private double m_currentRotation = 0.0;
+    private double m_currentTranslationDir = 0.0;
+    private double m_currentTranslationMag = 0.0;
+
+    private SlewRateLimiter m_magLimiter = new SlewRateLimiter(Constants.DriveConstants.kMagnitudeSlewRate);
+    private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(Constants.DriveConstants.kRotationalSlewRate);
+    private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
     /**
      * Creates a new DriveSubsystem.
      */
     public DriveSubsystem() {
+    }
+
+    public static DriveSubsystem getInstance() {
+        if (instance == null) {
+            instance = new DriveSubsystem();
+        }
+        return instance;
     }
 
     @Override

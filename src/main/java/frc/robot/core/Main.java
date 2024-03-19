@@ -1,6 +1,5 @@
 package frc.robot.core;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Main {

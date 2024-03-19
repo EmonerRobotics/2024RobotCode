@@ -7,6 +7,8 @@ package frc.robot.modules.internal.shooter.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.modules.internal.shooter.ShooterSubsystem;
 
+import static frc.robot.core.utils.LoggingUtils.logEvent;
+
 public class ShooterCommand extends Command {
     private static ShooterCommand instance = null;
 
@@ -34,7 +36,7 @@ public class ShooterCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        System.out.println("SHOOTER end");
+        logEvent();
         shooterSubsystem.setMotors(false);
     }
 
