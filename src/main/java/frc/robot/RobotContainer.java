@@ -92,7 +92,7 @@ public class RobotContainer {
                 upSystemJoystick,
                 5
         ).whileTrue(
-                IntakeCommand.getInstance(IntakeType.STANDARD)
+                IntakeCommand.forceNewInstance(IntakeType.STANDARD)
         );
 
         new JoystickButton(

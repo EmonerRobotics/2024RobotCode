@@ -8,12 +8,15 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.autonomous.CenterToTarget;
 import frc.robot.core.enums.PositionType;
 import frc.robot.modules.external.limelight.LimelightSubsystem;
 import frc.robot.modules.external.ultrasonic.MZ80;
 import frc.robot.modules.internal.arm.ArmSubsystem;
 
 import java.util.Objects;
+
+import static frc.robot.core.utils.LoggingUtils.logEvent;
 
 public class ArmCommand extends Command {
     private static ArmCommand instance = null;
@@ -25,6 +28,7 @@ public class ArmCommand extends Command {
     private final PIDController pidController;
     private PositionType positionType;
     private boolean armLocked = false;
+    private boolean isFirstAttemptToShoot = true;
 
     private ArmCommand() {
         this.pidController = new PIDController(0, 0, 0);
@@ -50,11 +54,12 @@ public class ArmCommand extends Command {
         instance = new ArmCommand();
         instance.setPIDController(positionType);
         instance.callback = callback;
+        logEvent();
         return instance;
     }
 
-    private void setArmLocked(){
-        armLocked = !armLocked;
+    private void setArmLocked(boolean value){
+        armLocked = value;
     }
 
     private void setPIDController(PositionType positionType) {
@@ -70,8 +75,8 @@ public class ArmCommand extends Command {
 
     @Override
     public void initialize() {
-       // logMessage("arm initialize");
-        setArmLocked();
+        logEvent();
+        setArmLocked(true);
         pidController.reset();
     }
 
@@ -91,7 +96,7 @@ public class ArmCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        boolean commandShouldFinish = !armLocked || !MZ80.getInstance().isSenorDistanceReached();
+        boolean commandShouldFinish = !MZ80.getInstance().isSenorDistanceReached();
 
         double errorMargin = armSubsystem.getEncoderDegrees() - positionType.positionDegree;
 
@@ -101,9 +106,12 @@ public class ArmCommand extends Command {
                 errorMargin = limelightSubsystem.findShooterDegrees() - armSubsystem.getEncoderDegrees();
                 SmartDashboard.putNumber("ARM SPEAKER ERROR: ", errorMargin);
 
-                if(errorMargin < 0.5){
-                   // logMessage("ARM COMMAND SHOULD END");
-                    callback.shoot();
+                if(errorMargin <= 0.4){
+                    if(isFirstAttemptToShoot && !CenterToTarget.getInstance().getIsCenterToTargetActive()){
+                        callback.shoot();
+                        isFirstAttemptToShoot = false;
+                    }
+
                 }
 
                 break;
@@ -113,13 +121,16 @@ public class ArmCommand extends Command {
 
         }
 
+        if(commandShouldFinish){
+            isFirstAttemptToShoot = true;
+        }
+
         return commandShouldFinish;
     }
 
     @Override
     public void end(boolean interrupted) {
-
-        setArmLocked();
+        setArmLocked(false);
 
         if (positionType == PositionType.GROUND) {
             System.out.println("GROUND end");

@@ -7,11 +7,13 @@ import frc.robot.autonomous.enums.CenteringStartPosition;
 import frc.robot.modules.internal.drivetrain.DriveSubsystem;
 import frc.robot.modules.external.limelight.LimelightSubsystem;
 
+import static frc.robot.core.utils.LoggingUtils.logEvent;
+
 public class CenterToTarget extends Command {
 
     public static CenterToTarget instance = null;
 
-    public static final double HORIZONTAL_MAX_ERROR_ANGLE = 0.9;
+    public static final double HORIZONTAL_MAX_ERROR_ANGLE = 0.5;
     public static final double MINIMUM_SPEED_THRESHOLD = 0.045;
     public static final double MINIMUM_SPEED = 0.05;
     public static final double SPEED_DIVIDER = 3.2;
@@ -21,6 +23,8 @@ public class CenterToTarget extends Command {
     private final DriveSubsystem driveSubsystem = DriveSubsystem.getInstance();
     private double centeringSpeed;
     private double cacheLimelightAngle;
+
+    private boolean isCenterToTargetActive = true;
 
     public static CenterToTarget getInstance() {
         if (instance == null) {
@@ -38,6 +42,10 @@ public class CenterToTarget extends Command {
         pidController.setSetpoint(0);
 
         addRequirements(limelightSubsystem);
+    }
+
+    public boolean getIsCenterToTargetActive(){
+        return isCenterToTargetActive;
     }
 
     private double getCurrentLimelightAngle() {
@@ -143,6 +151,7 @@ public class CenterToTarget extends Command {
         cacheLimelightAngle = limelightSubsystem.getHorizontalTargetOffsetAngle();
         double calcres = calculateCenteringSpeedWithPid(cacheLimelightAngle);
         setCenteringSpeed(calcres);
+        logEvent();
        // logMessage("initialized:" + cacheLimelightAngle);
        // logMessage("initialized:" + calcres);
     }
@@ -170,19 +179,6 @@ public class CenterToTarget extends Command {
 
     }
 
-    @Override
-    public void end(boolean interrupted) {
-
-        driveSubsystem.drive(
-                0,
-                0,
-                0,
-                true,
-                false
-
-        );
-    }
-
     private boolean targetDetected = false;
     private long lastDetectionTime = System.currentTimeMillis();
 
@@ -196,9 +192,7 @@ public class CenterToTarget extends Command {
             long timeSinceLastDetection = currentTime - lastDetectionTime;
 
             if (timeSinceLastDetection >= 2000) {
-               // logMessage("target NOT detected for 2 seconds.");
-              //  logMessage("centering speed: " + centeringSpeed);
-              //  logMessage("cached angle: " + cacheLimelightAngle);
+                isCenterToTargetActive = false;
                 return true;
             }
         } else {
@@ -206,10 +200,23 @@ public class CenterToTarget extends Command {
         }
 
         if (isHorizontalTargetOffsetAngleErrorReached && isTargetDetected()) {
-          //  logMessage("target REACHED: " + Math.abs(limelightSubsystem.getHorizontalTargetOffsetAngle()));
+            isCenterToTargetActive = false;
             return true;
         }
 
         return false;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        logEvent();
+        driveSubsystem.drive(
+                0,
+                0,
+                0,
+                true,
+                false
+
+        );
     }
 }

@@ -6,19 +6,23 @@ import frc.robot.modules.internal.arm.commands.ArmCommand;
 import frc.robot.modules.internal.arm.commands.ArmCommandCallback;
 import frc.robot.modules.internal.shooter.commands.ShooterSenderCommand;
 
+import static frc.robot.core.utils.LoggingUtils.logMessage;
+
 
 public class FireCommand {
     public Command fireCommand() {
         ArmCommandCallback armCommandCallback = new ArmCommandCallback() {
             @Override
             public void shoot() {
-              //  logMessage("Shooting*********************************");
+                logMessage("Shooting*********************************");
                 CommandScheduler.getInstance().schedule(ShooterSenderCommand.getInstance());
             }
         };
 
+
+
         return new ParallelCommandGroup(
-                new CenterToTarget(),
+                CenterToTarget.getInstance(),
                 ArmCommand.forceNewInstance(
                         PositionType.TARGET,
                         armCommandCallback

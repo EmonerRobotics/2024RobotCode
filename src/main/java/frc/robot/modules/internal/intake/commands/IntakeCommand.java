@@ -10,6 +10,9 @@ import frc.robot.modules.external.ultrasonic.MZ80;
 import frc.robot.modules.internal.intake.IntakeSubsystem;
 import frc.robot.modules.internal.intake.IntakeType;
 
+import static frc.robot.core.utils.LoggingUtils.logEvent;
+import static frc.robot.core.utils.LoggingUtils.logMessage;
+
 public class IntakeCommand extends Command {
     private static IntakeCommand instance = null;
 
@@ -28,6 +31,15 @@ public class IntakeCommand extends Command {
         if (instance == null) {
             instance = new IntakeCommand();
         }
+        logMessage(intakeType.name());
+        instance.setIntakeType(intakeType);
+        return instance;
+    }
+
+    public static IntakeCommand forceNewInstance(
+            IntakeType intakeType
+    ) {
+        instance = new IntakeCommand();
         instance.setIntakeType(intakeType);
         return instance;
     }
@@ -58,14 +70,13 @@ public class IntakeCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
+        logEvent();
         intakeSubsystem.setMotor(false);
     }
 
     @Override
     public boolean isFinished() {
         if (intakeType == IntakeType.STANDARD) {
-            System.out.println("-----ultrasonic sensor");
-            System.out.println(String.valueOf(mz80.isSenorDistanceReached()));
             return isCommandEnd;
         }
         return false;
