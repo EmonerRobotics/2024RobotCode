@@ -1,6 +1,6 @@
 package frc.robot.autonomous;
 
-import edu.wpi.first.wpilibj2.command.Command;
+
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.core.enums.PositionType;
@@ -10,9 +10,9 @@ import frc.robot.modules.internal.shooter.commands.ShooterSenderCommand;
 
 import static frc.robot.core.utils.LoggingUtils.logEvent;
 
+public class FireCommand extends ParallelCommandGroup {
+    public FireCommand() {
 
-public class FireCommand {
-    public Command fireCommand() {
         ArmCommandCallback armCommandCallback = new ArmCommandCallback() {
             @Override
             public void shoot() {
@@ -21,17 +21,14 @@ public class FireCommand {
             }
         };
 
-
-        return new ParallelCommandGroup(
+        addCommands(
                 CenterToTarget.getInstance(),
                 ArmCommand.forceNewInstance(
                         PositionType.TARGET,
                         armCommandCallback
                 )
-        );
-        // ShooterSenderCommand.forceNewInstance()
-        //ArmCommand.forceNewInstance(PositionType.GROUND)
 
+        );
 
     }
 }

@@ -4,18 +4,20 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.autonomous.enums.CenteringStartPosition;
-import frc.robot.modules.external.limelight.LimelightSubsystem;
 import frc.robot.modules.internal.drivetrain.DriveSubsystem;
+import frc.robot.modules.external.limelight.LimelightSubsystem;
 
 import static frc.robot.core.utils.LoggingUtils.logEvent;
 
 public class CenterToTarget extends Command {
 
+    public static CenterToTarget instance = null;
+
     public static final double HORIZONTAL_MAX_ERROR_ANGLE = 0.5;
     public static final double MINIMUM_SPEED_THRESHOLD = 0.045;
     public static final double MINIMUM_SPEED = 0.05;
     public static final double SPEED_DIVIDER = 3.2;
-    public static CenterToTarget instance = null;
+
     private final LimelightSubsystem limelightSubsystem = LimelightSubsystem.getInstance();
     private final PIDController pidController;
     private final DriveSubsystem driveSubsystem = DriveSubsystem.getInstance();
@@ -23,7 +25,13 @@ public class CenterToTarget extends Command {
     private double cacheLimelightAngle;
 
     private boolean isCenterToTargetActive = true;
-    private long lastDetectionTime = System.currentTimeMillis();
+
+    public static CenterToTarget getInstance() {
+        if (instance == null) {
+            instance = new CenterToTarget();
+        }
+        return instance;
+    }
 
     public CenterToTarget() {
         pidController = new PIDController(
@@ -36,14 +44,7 @@ public class CenterToTarget extends Command {
         addRequirements(limelightSubsystem);
     }
 
-    public static CenterToTarget getInstance() {
-        if (instance == null) {
-            instance = new CenterToTarget();
-        }
-        return instance;
-    }
-
-    public boolean getIsCenterToTargetActive() {
+    public boolean getIsCenterToTargetActive(){
         return isCenterToTargetActive;
     }
 
@@ -95,13 +96,13 @@ public class CenterToTarget extends Command {
         switch (getStartingPosition()) {
             case LEFT:
                 if (centeringSpeed > -MINIMUM_SPEED_THRESHOLD) {
-                    //  logMessage("LEFT MINIMUM");
+                  //  logMessage("LEFT MINIMUM");
                     return -MINIMUM_SPEED;
                 }
                 break;
             case RIGHT:
                 if (centeringSpeed < MINIMUM_SPEED_THRESHOLD) {
-                    //  logMessage("RIGHT MINIMUM");
+                  //  logMessage("RIGHT MINIMUM");
                     return MINIMUM_SPEED;
                 }
                 break;
@@ -118,20 +119,20 @@ public class CenterToTarget extends Command {
         double newSpeed;
         switch (getStartingPosition()) {
             case LEFT:
-                // logMessage("LEFT ANOMALIES");
+               // logMessage("LEFT ANOMALIES");
                 if (!isAnomalyDetectedForLeft(currentLimelightAngle)) {
                     newSpeed = calculateCenteringSpeedWithPid(currentLimelightAngle);
                     setCenteringSpeed(newSpeed);
-                    //     logMessage("selam 1");
+               //     logMessage("selam 1");
                     setLimelightCacheWithNewAngle(currentLimelightAngle);
                 } else {
-                    //     logMessage("selam 2");
+               //     logMessage("selam 2");
                     newSpeed = calculateCenteringSpeedWithPid(cacheLimelightAngle);
                     setCenteringSpeed(newSpeed);
                 }
                 break;
             case RIGHT:
-                //   logMessage("RIGHT ANOMALIES");
+             //   logMessage("RIGHT ANOMALIES");
                 if (!isAnomalyDetectedForRight(currentLimelightAngle)) {
                     newSpeed = calculateCenteringSpeedWithPid(currentLimelightAngle);
                     setCenteringSpeed(newSpeed);
@@ -151,8 +152,8 @@ public class CenterToTarget extends Command {
         double calcres = calculateCenteringSpeedWithPid(cacheLimelightAngle);
         setCenteringSpeed(calcres);
         logEvent();
-        // logMessage("initialized:" + cacheLimelightAngle);
-        // logMessage("initialized:" + calcres);
+       // logMessage("initialized:" + cacheLimelightAngle);
+       // logMessage("initialized:" + calcres);
     }
 
     @Override
@@ -177,6 +178,8 @@ public class CenterToTarget extends Command {
         );
 
     }
+
+    private long lastDetectionTime = System.currentTimeMillis();
 
     @Override
     public boolean isFinished() {

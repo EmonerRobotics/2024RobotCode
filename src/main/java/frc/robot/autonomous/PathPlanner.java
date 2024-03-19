@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.modules.internal.intake.IntakeType;
 import frc.robot.modules.internal.intake.commands.IntakeCommand;
 import frc.robot.modules.internal.shooter.commands.ShooterCommand;
+import frc.robot.modules.internal.shooter.commands.ShooterSenderCommand;
 
 
 public class PathPlanner {
@@ -34,7 +35,7 @@ public class PathPlanner {
         //NamedCommands.registerCommand("fire", new FireCommand());
         NamedCommands.registerCommand("shooter", ShooterCommand.getInstance());
         // NamedCommands.registerCommand("slowArm", ArmCommand.getInstance(PositionType.TARGET));
-        //  NamedCommands.registerCommand("sender", ShooterSenderCommand.getInstance());
+      //  NamedCommands.registerCommand("sender", ShooterSenderCommand.getInstance());
         //NamedCommands.registerCommand("autoArm", ArmCommand.getInstance(PositionType.AUTO));
         //NamedCommands.registerCommand("zeroArm", ArmCommand.getInstance(PositionType.GROUND));
     }
